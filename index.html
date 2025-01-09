@@ -5,36 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Par for the Course - Classic</title>
     <style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-td {
-    border: 1px solid #d11111;
-    padding: 3px;
-    text-align: center;
-}
-.btn {
-    background-color: #d11111;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin: 2px;
-}
-.btn:hover {
-    opacity: 0.8;
-}
-.score-controls-row {
-    margin-bottom: 10px;
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        td {
+            border: 1px solid #d11111;
+            padding: 8px;
+            text-align: center;
+        }
+        .btn {
+            background-color: #d11111;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .score-controls-row {
+            margin-bottom: 10px;
+        }
+
 #box-score {
     display: none; /* Hide the box score by default */
     transition: max-height 0.3s ease-out;
@@ -42,14 +43,19 @@ td {
 #box-score.expanded {
     display: table; /* Show the box score when expanded */
 }
-
-
     </style>
 </head>
 <body>
     <div id="splash-screen">
         <img src="images/Splash-Screen.png" alt="Splash Screen" width=300px height=auto>
-        <button id="start-game" class="btn">Next</button>
+        <button id="setup-game" class="btn">Start</button>
+    </div>
+
+    <div id="player-setup" style="display: none;">
+        <h2>Player Setup</h2>
+        <div id="player-inputs"></div>
+        <button id="add-player" class="btn">Add Player</button>
+        <button id="start-game" class="btn">Start Game</button>
     </div>
 
     <div id="game-container" style="display: none;">
@@ -61,13 +67,14 @@ td {
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const totalCards = 18;
-        const playerScores = [
-            { name: "Player 1", scores: Array(totalCards).fill(0) },
-            { name: "Player 2", scores: Array(totalCards).fill(0) }
-        ];
+        const playerScores = [];
         let currentHole = 0;
 
         const splashScreen = document.getElementById("splash-screen");
+        const setupGameButton = document.getElementById("setup-game");
+        const playerSetup = document.getElementById("player-setup");
+        const playerInputs = document.getElementById("player-inputs");
+        const addPlayerButton = document.getElementById("add-player");
         const startGameButton = document.getElementById("start-game");
         const gameContainer = document.getElementById("game-container");
 
@@ -91,9 +98,45 @@ td {
         // Generate image paths
         const imagePaths = Array.from({ length: totalCards }, (_, i) => `images/card${i + 1}.png`);
 
-        startGameButton.addEventListener("click", () => {
+        setupGameButton.addEventListener("click", () => {
             splashScreen.style.display = "none";
+            playerSetup.style.display = "block";
+            addPlayerInput("Player 1");
+            addPlayerInput("Player 2");
+        });
+
+        addPlayerButton.addEventListener("click", () => {
+            const playerName = `Player ${playerScores.length + 1}`;
+            addPlayerInput(playerName);
+        });
+
+        const addPlayerInput = (defaultName) => {
+            const playerInputDiv = document.createElement("div");
+            const playerInput = document.createElement("input");
+            playerInput.type = "text";
+            playerInput.placeholder = "Enter player name";
+            playerInput.value = defaultName;
+            playerInputDiv.appendChild(playerInput);
+            playerInputs.appendChild(playerInputDiv);
+        };
+
+        startGameButton.addEventListener("click", () => {
+            const inputFields = [...playerInputs.children].map(div => div.querySelector("input"));
+            const validInputs = inputFields.filter(input => input.value.trim() !== "");
+
+            if (validInputs.length === 0) {
+                alert("Please enter at least one player name.");
+                return;
+            }
+
+            playerSetup.style.display = "none";
             gameContainer.style.display = "block";
+
+            playerScores.length = 0;
+            validInputs.forEach(input => {
+                playerScores.push({ name: input.value.trim(), scores: Array(totalCards).fill(0) });
+            });
+
             displayRandomCard(); // Show a random card at the start
             renderScoreButtons();
             updateBoxScore();
@@ -131,25 +174,18 @@ td {
         const adjustScore = (playerIndex, holeIndex, adjustment) => {
             if (holeIndex >= 0 && holeIndex < totalCards && playerIndex >= 0 && playerIndex < playerScores.length) {
                 playerScores[playerIndex].scores[holeIndex] += adjustment;
-
-                console.log(`Adjusting Player ${playerIndex + 1}, Hole ${holeIndex + 1}, by ${adjustment}`);
                 updateBoxScore();
-            } else {
-                console.error("Invalid playerIndex or holeIndex:", playerIndex, holeIndex);
             }
         };
 
 const updateBoxScore = () => {
-    // Display Total Scores
-    const totalScoresContainer = document.getElementById("total-scores") || document.createElement("div");
-    totalScoresContainer.id = "total-scores";
-    totalScoresContainer.innerHTML = playerScores
+    // Display Total Scores Only
+    scoreControls.innerHTML = playerScores
         .map(player => {
             const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
             return `<div><strong>${player.name}:</strong> ${totalScore}</div>`;
         })
         .join("");
-    gameContainer.insertBefore(totalScoresContainer, boxScoreTable);
 
     // Update Detailed Box Score Table
     boxScoreTable.innerHTML = "";
@@ -173,30 +209,25 @@ const updateBoxScore = () => {
     });
 };
 
-// Add Toggle Button Once
-let toggleBoxScoreButton = document.getElementById("toggle-box-score");
-if (!toggleBoxScoreButton) {
-    toggleBoxScoreButton = document.createElement("button");
-    toggleBoxScoreButton.id = "toggle-box-score";
-    toggleBoxScoreButton.classList.add("btn");
-    toggleBoxScoreButton.textContent = "Toggle Box Score";
-    gameContainer.insertBefore(toggleBoxScoreButton, boxScoreTable);
+// Add Toggle Button
+const toggleBoxScoreButton = document.createElement("button");
+toggleBoxScoreButton.classList.add("btn");
+toggleBoxScoreButton.textContent = "Toggle Box Score";
+gameContainer.insertBefore(toggleBoxScoreButton, boxScoreTable);
 
-    toggleBoxScoreButton.addEventListener("click", () => {
-        boxScoreTable.classList.toggle("expanded");
-    });
-}
+toggleBoxScoreButton.addEventListener("click", () => {
+    boxScoreTable.classList.toggle("expanded");
+});
 
         const displayRandomCard = () => {
             const randomIndex = Math.floor(Math.random() * totalCards);
             cardImage.src = imagePaths[randomIndex];
-            console.log(`Displaying card: ${imagePaths[randomIndex]}`);
         };
 
         nextHoleButton.addEventListener("click", () => {
             if (currentHole < totalCards - 1) {
                 currentHole++;
-                displayRandomCard(); // Show a new random card on each click
+                displayRandomCard();
                 renderScoreButtons();
                 updateBoxScore();
             } else {
@@ -205,7 +236,7 @@ if (!toggleBoxScoreButton) {
         });
     });
 </script>
-    <h6>v 0.7.5.8</h6>
+    <h6>v 0.7.5.9</h6>
 </body>
 </html>
 
