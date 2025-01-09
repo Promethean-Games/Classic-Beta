@@ -1,237 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Par for the Course - Classic</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
-      text-align: center;
-    }
-
-    #splash-screen, #player-setup, #game-area {
-      max-width: 400px;
-      margin: 20px auto;
-      display: none;
-    }
-
-    #splash-screen img {
-      width: 100%;
-      max-width: 300px;
-    }
-
-    input[type="text"] {
-      width: 80%;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      background-color: #d11111;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .btn:hover {
-      background-color: #a50e0e;
-    }
-
-    #scoreboard, #box-score {
-      text-align: left;
-      margin-top: 20px;
-    }
-
-    .scoreboard-row, .box-score-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 5px 0;
-    }
-
-    .btn-small {
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-
-    .card-image {
-      width: 100%;
-      max-width: 400px;
-      margin: 20px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-
-    table, th, td {
-      border: 1px solid white;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #444;
-    }
-  </style>
+    <title>Par for the Course Scoring</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .score-card {
+            margin: 20px;
+        }
+        .score-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .score-row label {
+            width: 150px;
+        }
+        .score-row .buttons {
+            margin-left: 10px;
+        }
+        .score-row button {
+            margin: 0 5px;
+        }
+        .total-score {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash-screen">
-    <img src="images/Splash-Screen.png" alt="Splash Screen">
-    <button id="start-btn" class="btn">Start</button>
-  </div>
-
-  <!-- Player Setup Section -->
-  <div id="player-setup">
-    <h2>Enter Player Names</h2>
-    <div id="player-inputs"></div>
-    <button id="add-player-btn" class="btn">Add Player</button>
-    <button id="start-game-btn" class="btn">Start Game</button>
-  </div>
-
-  <!-- Game Area Section -->
-  <div id="game-area">
-    <img id="current-card" class="card-image" src="" alt="Card Image">
-    <div id="scoreboard"></div>
-    <div id="box-score">
-      <h3>Box Score</h3>
-      <table id="box-score-table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Hole 1</th>
-            <th>Hole 2</th>
-            <th>Hole 3</th>
-            <!-- Continue up to Hole 18 -->
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Rows populated dynamically -->
-        </tbody>
-      </table>
+    <div class="score-card">
+        <h1>Par for the Course Scoring</h1>
+        <div id="scoreRowsContainer">
+            <!-- Score rows will be dynamically added here -->
+        </div>
+        <button id="nextCardButton">Next Card</button>
+        <div class="total-score" id="totalScoreDisplay">Total Score: 0</div>
     </div>
-    <button id="next-card-btn" class="btn">Next Card</button>
-    <button id="restart-btn" class="btn">Restart</button>
-  </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const splashScreen = document.getElementById("splash-screen");
-      const playerSetup = document.getElementById("player-setup");
-      const gameArea = document.getElementById("game-area");
-      const startButton = document.getElementById("start-btn");
-      const playerInputsContainer = document.getElementById("player-inputs");
-      const addPlayerButton = document.getElementById("add-player-btn");
-      const startGameButton = document.getElementById("start-game-btn");
-      const nextCardButton = document.getElementById("next-card-btn");
-      const restartButton = document.getElementById("restart-btn");
-      const currentCardImage = document.getElementById("current-card");
-      const scoreboard = document.getElementById("scoreboard");
-      const boxScoreTable = document.getElementById("box-score-table").querySelector("tbody");
+    <script>
+        const scoreRowsContainer = document.getElementById('scoreRowsContainer');
+        const totalScoreDisplay = document.getElementById('totalScoreDisplay');
+        const nextCardButton = document.getElementById('nextCardButton');
 
-      const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
-      let playerScores = [];
-      let currentHole = 0;
+        let currentHole = 1;
+        let totalScore = 0;
+        const playerScores = [];
 
-      const displayRandomCard = () => {
-        const randomIndex = Math.floor(Math.random() * cardImages.length);
-        currentCardImage.src = cardImages[randomIndex];
-        currentCardImage.alt = `Card ${randomIndex + 1}`;
-      };
+        function addScoreRow(holeNumber) {
+            const row = document.createElement('div');
+            row.className = 'score-row';
 
-      const updateBoxScore = () => {
-        boxScoreTable.innerHTML = "";
-        playerScores.forEach(player => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${player.name}</td>
-            ${player.scores.map(score => `<td>${score || ""}</td>`).join("")}
-          `;
-          boxScoreTable.appendChild(row);
-        });
-      };
+            const label = document.createElement('label');
+            label.textContent = `Hole ${holeNumber}:`;
 
-      const addPlayerInput = () => {
-        const playerCount = playerInputsContainer.children.length + 1;
-        const playerDiv = document.createElement("div");
-        playerDiv.classList.add("player-input");
-        playerDiv.innerHTML = `
-          <input type="text" placeholder="Player ${playerCount}" />
-        `;
-        playerInputsContainer.appendChild(playerDiv);
-      };
+            const scoreDisplay = document.createElement('span');
+            scoreDisplay.textContent = '0';
+            scoreDisplay.className = 'score-display';
 
-      startButton.addEventListener("click", function () {
-        splashScreen.style.display = "none";
-        playerSetup.style.display = "block";
-      });
+            const buttons = document.createElement('div');
+            buttons.className = 'buttons';
 
-      addPlayerInput();
+            const incrementButton = document.createElement('button');
+            incrementButton.textContent = '+1';
+            incrementButton.addEventListener('click', () => {
+                const currentScore = parseInt(scoreDisplay.textContent, 10);
+                scoreDisplay.textContent = currentScore + 1;
+                updateTotalScore();
+            });
 
-      addPlayerButton.addEventListener("click", function () {
-        addPlayerInput();
-      });
+            const decrementButton = document.createElement('button');
+            decrementButton.textContent = '-1';
+            decrementButton.addEventListener('click', () => {
+                const currentScore = parseInt(scoreDisplay.textContent, 10);
+                if (currentScore > 0) {
+                    scoreDisplay.textContent = currentScore - 1;
+                    updateTotalScore();
+                }
+            });
 
-      startGameButton.addEventListener("click", function () {
-        const playerNames = Array.from(playerInputsContainer.querySelectorAll("input"))
-          .map(input => input.value.trim())
-          .filter(name => name !== "");
+            buttons.appendChild(incrementButton);
+            buttons.appendChild(decrementButton);
 
-        if (playerNames.length === 0) {
-          alert("Please enter at least one player name.");
-          return;
+            row.appendChild(label);
+            row.appendChild(scoreDisplay);
+            row.appendChild(buttons);
+            scoreRowsContainer.appendChild(row);
+
+            playerScores.push(0);
         }
 
-        playerScores = playerNames.map(name => ({
-          name,
-          scores: Array(18).fill(null)
-        }));
-
-        playerSetup.style.display = "none";
-        gameArea.style.display = "block";
-
-        currentHole = 0;
-        displayRandomCard();
-        updateBoxScore();
-      });
-
-      nextCardButton.addEventListener("click", function () {
-        if (currentHole >= 18) {
-          alert("All holes completed!");
-          return;
+        function updateTotalScore() {
+            let newTotal = 0;
+            const scores = scoreRowsContainer.querySelectorAll('.score-display');
+            scores.forEach(score => {
+                const value = parseInt(score.textContent, 10);
+                if (!isNaN(value)) {
+                    newTotal += value;
+                }
+            });
+            totalScore = newTotal;
+            totalScoreDisplay.textContent = `Total Score: ${totalScore}`;
         }
 
-        currentHole++;
-
-        playerScores.forEach(player => {
-          const score = prompt(`Enter score for ${player.name} on Hole ${currentHole}`);
-          player.scores[currentHole - 1] = parseInt(score, 10) || 0;
+        nextCardButton.addEventListener('click', () => {
+            currentHole++;
+            addScoreRow(currentHole);
         });
 
-        updateBoxScore();
-        displayRandomCard();
-      });
-
-      restartButton.addEventListener("click", function () {
-        if (confirm("Are you sure you want to restart the game?")) {
-          location.reload();
-        }
-      });
-
-      splashScreen.style.display = "block";
-    });
-  </script>
-    <h6>v 0.7.4.14</h6>
+        // Initialize with the first hole
+        addScoreRow(currentHole);
+    </script>
+  <h6>v 07.4.15</h6>
 </body>
 </html>
