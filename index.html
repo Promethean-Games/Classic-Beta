@@ -107,30 +107,6 @@
     <div id="box-score">
       <h3>Box Score</h3>
       <table id="box-score-table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Hole 1</th>
-            <th>Hole 2</th>
-            <th>Hole 3</th>
-            <th>Hole 4</th>
-            <th>Hole 5</th>
-            <th>Hole 6</th>
-            <th>Hole 7</th>
-            <th>Hole 8</th>
-            <th>Hole 9</th>
-            <th>Hole 10</th>
-            <th>Hole 11</th>
-            <th>Hole 12</th>
-            <th>Hole 13</th>
-            <th>Hole 14</th>
-            <th>Hole 15</th>
-            <th>Hole 16</th>
-            <th>Hole 17</th>
-            <th>Hole 18</th>
-            <th>Total</th> <!-- Total column added -->
-          </tr>
-        </thead>
         <tbody>
           <!-- Rows populated dynamically -->
         </tbody>
@@ -197,9 +173,10 @@
         playerScores.forEach(player => {
           const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
           const row = document.createElement("tr");
+          const holeScores = player.scores.map(score => `<td>${score || 0}</td>`).join("");
           row.innerHTML = `
             <td>${player.name}</td>
-            ${player.scores.map(score => `<td>${score || 0}</td>`).join("")}
+            ${holeScores}
             <td>${totalScore}</td> <!-- Total Score column -->
           `;
           boxScoreTable.appendChild(row);
@@ -252,7 +229,7 @@
 
       nextCardButton.addEventListener("click", function () {
         if (currentHole >= 18) {
-          alert("GAME OVER");
+          alert("All holes completed!");
           return;
         }
 
@@ -267,7 +244,7 @@
       });
 
       restartButton.addEventListener("click", function () {
-        if (confirm("This will CLEAR ALL player names and scores. Do you wish to continue?")) {
+        if (confirm("Are you sure you want to restart the game?")) {
           location.reload();
         }
       });
@@ -275,6 +252,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.4.23</h6>
+  <h6>v 0.7.5</h6>
 </body>
 </html>
