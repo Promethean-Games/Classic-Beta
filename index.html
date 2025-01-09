@@ -105,7 +105,6 @@
     <img id="current-card" class="card-image" src="" alt="Card Image">
     <div id="scoreboard"></div>
     <div id="box-score">
-      <h3>Box Score</h3>
       <table id="box-score-table">
         <thead>
           <tr>
@@ -117,6 +116,7 @@
         </tbody>
       </table>
     </div>
+    <div id="score-controls"></div> <!-- Score control buttons here -->
     <button id="next-card-btn" class="btn">Next Card</button>
     <button id="restart-btn" class="btn">Restart</button>
   </div>
@@ -135,6 +135,7 @@
       const currentCardImage = document.getElementById("current-card");
       const scoreboard = document.getElementById("scoreboard");
       const boxScoreTable = document.getElementById("box-score-table").querySelector("tbody");
+      const scoreControls = document.getElementById("score-controls");
 
       const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
       let playerScores = [];
@@ -148,15 +149,21 @@
       };
 
       const renderScoreButtons = () => {
+        // Clear existing buttons to prevent duplicates
+        scoreControls.innerHTML = "";
+
+        // Create buttons to adjust the score for the current hole
+        const buttonContainer = document.createElement("div");
         playerScores.forEach((player, index) => {
-          const scoreControls = document.createElement("div");
-          scoreControls.classList.add("score-controls");
-          scoreControls.innerHTML = `
+          const scoreControlsDiv = document.createElement("div");
+          scoreControlsDiv.innerHTML = `
+            <span>${player.name}</span>
             <button class="btn btn-small" onclick="adjustScore(${index}, ${currentHole}, 1)">+1</button>
             <button class="btn btn-small" onclick="adjustScore(${index}, ${currentHole}, -1)">-1</button>
           `;
-          scoreboard.appendChild(scoreControls);
+          buttonContainer.appendChild(scoreControlsDiv);
         });
+        scoreControls.appendChild(buttonContainer);
       };
 
       const adjustScore = (playerIndex, holeIndex, adjustment) => {
@@ -238,7 +245,7 @@
       });
 
       restartButton.addEventListener("click", function () {
-        if (confirm("This will CLEAR ALL player names and scores. Do you wish to continue?")) {
+        if (confirm("Are you sure you want to restart the game?")) {
           location.reload();
         }
       });
@@ -246,6 +253,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.4.21</h6>
+  <h6>v 0.7.4.22</h6>
 </body>
 </html>
