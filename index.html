@@ -105,14 +105,11 @@
     <img id="current-card" class="card-image" src="" alt="Card Image">
     <div id="scoreboard"></div>
     <div id="box-score">
-      <h3>Box Score</h3>
       <table id="box-score-table">
         <thead>
           <tr>
             <th>Player</th>
             <th>Hole 1</th>
-            <th>Hole 2</th>
-            <th>Hole 3</th>
             <!-- Continue up to Hole 18 -->
           </tr>
         </thead>
@@ -137,7 +134,6 @@
       const nextCardButton = document.getElementById("next-card-btn");
       const restartButton = document.getElementById("restart-btn");
       const currentCardImage = document.getElementById("current-card");
-      const scoreboard = document.getElementById("scoreboard");
       const boxScoreTable = document.getElementById("box-score-table").querySelector("tbody");
 
       const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
@@ -156,7 +152,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${player.name}</td>
-            ${player.scores.map(score => `<td>${score || ""}</td>`).join("")}
+            ${player.scores.map(score => `<td>${score !== null ? score : ""}</td>`).join("")}
           `;
           boxScoreTable.appendChild(row);
         });
@@ -209,6 +205,7 @@
       nextCardButton.addEventListener("click", function () {
         if (currentHole >= 18) {
           alert("All holes completed!");
+          nextCardButton.style.display = "none";  // Hide Next Card button after 18 holes
           return;
         }
 
@@ -232,6 +229,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-    <h6>v 0.7.4.16</h6>
+    <h6>v 0.7.4.17</h6>
 </body>
 </html>
