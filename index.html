@@ -30,7 +30,7 @@
     }
 
     .btn {
-      padding: 10px 20px;
+      padding: 20px 20px;
       background-color: #d11111;
       color: white;
       border: none;
@@ -83,27 +83,21 @@
     th {
       background-color: #444;
     }
-
-    .score-buttons {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
   </style>
 </head>
 <body>
   <!-- Splash Screen -->
   <div id="splash-screen">
     <img src="images/Splash-Screen.png" alt="Splash Screen">
-    <button id="start-btn" class="btn">Start</button>
+    <button id="start-btn" class="btn">NEXT</button>
   </div>
 
   <!-- Player Setup Section -->
   <div id="player-setup">
     <h2>Enter Player Names</h2>
     <div id="player-inputs"></div>
-    <button id="add-player-btn" class="btn">Add Player</button>
-    <button id="start-game-btn" class="btn">Start Game</button>
+    <button id="add-player-btn" class="btn">ADD PLAYER</button>
+    <button id="start-game-btn" class="btn">START</button>
   </div>
 
   <!-- Game Area Section -->
@@ -111,7 +105,6 @@
     <img id="current-card" class="card-image" src="" alt="Card Image">
     <div id="scoreboard"></div>
     <div id="box-score">
-      <h3>Box Score</h3>
       <table id="box-score-table">
         <thead>
           <tr>
@@ -119,6 +112,22 @@
             <th>Hole 1</th>
             <th>Hole 2</th>
             <th>Hole 3</th>
+            <th>Hole 4</th>
+            <th>Hole 5</th>
+            <th>Hole 6</th>
+            <th>Hole 7</th>
+            <th>Hole 8</th>
+            <th>Hole 9</th>
+            <th>Hole 10</th>
+            <th>Hole 11</th>
+            <th>Hole 12</th>
+            <th>Hole 13</th>
+            <th>Hole 14</th>
+            <th>Hole 15</th>
+            <th>Hole 16</th>
+            <th>Hole 17</th>
+            <th>Hole 18</th>
+            
             <!-- Continue up to Hole 18 -->
           </tr>
         </thead>
@@ -162,7 +171,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${player.name}</td>
-            ${player.scores.map(score => `<td>${score || ""}</td>`).join("")}
+            ${player.scores.map(score => `<td>${score !== null ? score : 0}</td>`).join("")}
           `;
           boxScoreTable.appendChild(row);
         });
@@ -178,9 +187,8 @@
         playerInputsContainer.appendChild(playerDiv);
       };
 
-      const updateScore = (playerIndex, adjustment) => {
-        const player = playerScores[playerIndex];
-        player.scores[currentHole - 1] = (player.scores[currentHole - 1] || 0) + adjustment;
+      const updateScore = (playerIndex, value) => {
+        playerScores[playerIndex].scores[currentHole] = (playerScores[playerIndex].scores[currentHole] || 0) + value;
         updateBoxScore();
       };
 
@@ -207,7 +215,7 @@
 
         playerScores = playerNames.map(name => ({
           name,
-          scores: Array(18).fill(0) // Set initial score to 0 for each player and hole
+          scores: Array(18).fill(null)
         }));
 
         playerSetup.style.display = "none";
@@ -226,10 +234,17 @@
 
         currentHole++;
 
-        playerScores.forEach(player => {
-          const score = prompt(`Enter score for ${player.name} on Hole ${currentHole}`);
-          player.scores[currentHole - 1] = parseInt(score, 10) || 0;
-        });
+        // Dynamically generate score adjustment buttons for the current hole
+        scoreboard.innerHTML = playerScores.map((player, index) => {
+          return `
+            <div class="scoreboard-row">
+              <span>${player.name}</span>
+              <button class="btn-small" onclick="updateScore(${index}, 1)">+1</button>
+              <button class="btn-small" onclick="updateScore(${index}, -1)">-1</button>
+              <span>Current Score: ${player.scores[currentHole] !== null ? player.scores[currentHole] : 0}</span>
+            </div>
+          `;
+        }).join("");
 
         updateBoxScore();
         displayRandomCard();
@@ -244,6 +259,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-    <h6>v 0.7.4.18</h6>
+  <h6>v 0.7.4.19</h6>
 </body>
 </html>
