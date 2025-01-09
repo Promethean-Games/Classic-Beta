@@ -64,6 +64,29 @@
       max-width: 400px;
       margin: 20px 0;
     }
+
+    #box-score {
+      margin-top: 20px;
+      background-color: #222;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    #box-score table {
+      width: 100%;
+      color: white;
+      border-collapse: collapse;
+    }
+
+    #box-score th, #box-score td {
+      border: 1px solid #555;
+      padding: 5px;
+      text-align: center;
+    }
+
+    #box-score th {
+      background-color: #444;
+    }
   </style>
 </head>
 <body>
@@ -87,6 +110,22 @@
     <div id="scoreboard"></div>
     <button id="next-card-btn" class="btn">Next Card</button>
     <button id="restart-btn" class="btn">Restart</button>
+    <div id="box-score">
+      <h3>Box Score</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Hole</th>
+            <th id="player1-name"></th>
+            <th id="player2-name"></th>
+            <!-- More players will be added dynamically -->
+          </tr>
+        </thead>
+        <tbody id="box-score-body">
+          <!-- Score rows will be added dynamically -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -102,6 +141,8 @@
       const restartButton = document.getElementById("restart-btn");
       const currentCardImage = document.getElementById("current-card");
       const scoreboard = document.getElementById("scoreboard");
+      const boxScoreBody = document.getElementById("box-score-body");
+      const playerNamesHeaders = document.querySelectorAll("#box-score th[id^='player']");
 
       const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
       let playerScores = [];
@@ -143,8 +184,33 @@
             const change = parseInt(this.dataset.change, 10);
             playerScores[index].score += change;
             updateScoreboard();
+            updateBoxScore(index);
           });
         });
+      };
+
+      const initializeBoxScore = () => {
+        boxScoreBody.innerHTML = "";
+
+        for (let hole = 1; hole <= 18; hole++) {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${hole}</td>` + playerScores.map(() => `<td>0</td>`).join("");
+          boxScoreBody.appendChild(row);
+        }
+
+        playerScores.forEach((player, index) => {
+          const header = document.querySelector(`#player${index + 1}-name`);
+          if (header) header.textContent = player.name;
+        });
+      };
+
+      const updateBoxScore = (playerIndex) => {
+        const rows = boxScoreBody.querySelectorAll("tr");
+        const latestHole = Math.min(playerScores[playerIndex].score, 18) - 1;
+        if (latestHole >= 0) {
+          const cell = rows[latestHole].children[playerIndex + 1];
+          cell.textContent = playerScores[playerIndex].score;
+        }
       };
 
       startButton.addEventListener("click", function () {
@@ -175,6 +241,7 @@
 
         displayRandomCard();
         updateScoreboard();
+        initializeBoxScore();
       });
 
       nextCardButton.addEventListener("click", function () {
@@ -199,7 +266,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.4.3</h6>
+  <h6>v 0.7.4.12</h6>
 </body>
 </html>
-
