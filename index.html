@@ -131,6 +131,14 @@
       const scoreboard = document.getElementById("scoreboard");
       const boxScoreTable = document.getElementById("box-score-table").querySelector("tbody");
       const scoreControls = document.getElementById("score-controls");
+      const adjustScore = (playerIndex, holeIndex, adjustment) => {
+    console.log(`Adjusting Player ${playerIndex + 1}, Hole ${holeIndex + 1}, by ${adjustment}`);
+    // Existing code
+};
+
+        // Check if holeIndex and playerIndex are within bounds
+    if (holeIndex >= 0 && holeIndex < totalCards && playerIndex >= 0 && playerIndex < playerScores.length) {
+        playerScores[playerIndex].scores[holeIndex] += adjustment;
 
       const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
       let playerScores = [];
@@ -252,6 +260,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.5.1</h6>
+  <h6>v 0.7.5.2</h6>
 </body>
 </html>
