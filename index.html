@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Par for the Course - Classic</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+    }
+
+    #splash-screen, #player-setup, #game-area {
+      max-width: 400px;
+      margin: 20px auto;
+      display: none;
+    }
+
+    #splash-screen img {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #d11111;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #a50e0e;
+    }
+
+    .card-image {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #fff;
+      text-align: center;
+    }
+
+    .score-buttons button {
+      margin: 2px;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <img src="images/Splash-Screen.png" alt="Splash Screen">
+    <button id="start-btn" class="btn">Start</button>
+  </div>
+
+  <!-- Player Setup Section -->
+  <div id="player-setup">
+    <h2>Enter Player Names</h2>
+    <div id="player-inputs"></div>
+    <button id="add-player-btn" class="btn">Add Player</button>
+    <button id="start-game-btn" class="btn">Start Game</button>
+  </div>
+
+  <!-- Game Area Section -->
+  <div id="game-area">
+    <img id="current-card" class="card-image" src="" alt="Card Image">
+    <div id="scoreboard">
+      <table>
+        <thead>
+          <tr>
+            <th>Hole</th>
+            <th id="player1-name">Player 1</th>
+            <!-- Dynamically add player columns here -->
+          </tr>
+        </thead>
+        <tbody id="scoreboard-body">
+          <!-- Scores will populate here -->
+        </tbody>
+      </table>
+    </div>
+    <button id="next-card-btn" class="btn">Next Card</button>
+    <button id="restart-btn" class="btn">Restart</button>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const splashScreen = document.getElementById("splash-screen");
+      const playerSetup = document.getElementById("player-setup");
+      const gameArea = document.getElementById("game-area");
+      const startButton = document.getElementById("start-btn");
+      const playerInputsContainer = document.getElementById("player-inputs");
+      const addPlayerButton = document.getElementById("add-player-btn");
+      const startGameButton = document.getElementById("start-game-btn");
+      const nextCardButton = document.getElementById("next-card-btn");
+      const restartButton = document.getElementById("restart-btn");
+      const currentCardImage = document.getElementById("current-card");
+      const scoreboardBody = document.getElementById("scoreboard-body");
+
+      const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
+      let playerScores = [];
+      let currentHole = 0;
+
+      const addPlayerInput = () => {
+        const playerCount = playerInputsContainer.children.length + 1;
+        const playerDiv = document.createElement("div");
+        playerDiv.innerHTML = `<input type="text" placeholder="Player ${playerCount}" />`;
+        playerInputsContainer.appendChild(playerDiv);
+      };
+
+      const displayRandomCard = () => {
+        if (currentHole >= cardImages.length) {
+          alert("Game Over! All holes have been completed.");
+          return;
+        }
+        currentCardImage.src = cardImages[currentHole];
+        currentCardImage.alt = `Hole ${currentHole + 1}`;
+        populateScoreboard();
+      };
+
+      const populateScoreboard = () => {
+        scoreboardBody.innerHTML = "";
+        for (let hole = 0; hole <= currentHole; hole++) {
+          const row = document.createElement("tr");
+          const holeCell = document.createElement("td");
+          holeCell.textContent = `Hole ${hole + 1}`;
+          row.appendChild(holeCell);
+
+          playerScores.forEach((player, index) => {
+            const scoreCell = document.createElement("td");
+
+            if (hole === currentHole) {
+              const scoreButtons = document.createElement("div");
+              scoreButtons.classList.add("score-buttons");
+
+              const addButton = document.createElement("button");
+              addButton.textContent = "+1";
+              addButton.addEventListener("click", () => {
+                player.scores[hole]++;
+                populateScoreboard();
+              });
+
+              const subtractButton = document.createElement("button");
+              subtractButton.textContent = "-1";
+              subtractButton.addEventListener("click", () => {
+                if (player.scores[hole] > 0) player.scores[hole]--;
+                populateScoreboard();
+              });
+
+              scoreButtons.appendChild(addButton);
+              scoreButtons.appendChild(subtractButton);
+              scoreCell.appendChild(scoreButtons);
+            } else {
+              scoreCell.textContent = player.scores[hole] || 0;
+            }
+
+            row.appendChild(scoreCell);
+          });
+
+          scoreboardBody.appendChild(row);
+        }
+      };
+
+      startButton.addEventListener("click", () => {
+        splashScreen.style.display = "none";
+        playerSetup.style.display = "block";
+      });
+
+      addPlayerButton.addEventListener("click", addPlayerInput);
+
+      startGameButton.addEventListener("click", () => {
+        const playerNames = Array.from(playerInputsContainer.querySelectorAll("input"))
+          .map(input => input.value.trim())
+          .filter(name => name !== "");
+
+        if (playerNames.length === 0) {
+          alert("Please enter at least one player name.");
+          return;
+        }
+
+        playerScores = playerNames.map(name => ({ name, scores: Array(cardImages.length).fill(0) }));
+        playerSetup.style.display = "none";
+        gameArea.style.display = "block";
+        currentHole = 0;
+        displayRandomCard();
+      });
+
+      nextCardButton.addEventListener("click", () => {
+        if (currentHole < cardImages.length - 1) {
+          currentHole++;
+          displayRandomCard();
+        } else {
+          alert("Game Over! All holes have been completed.");
+        }
+      });
+
+      restartButton.addEventListener("click", () => {
+        const confirmRestart = confirm("Are you sure you want to restart? All scores and names will be cleared.");
+        if (confirmRestart) {
+          gameArea.style.display = "none";
+          playerSetup.style.display = "block";
+          playerInputsContainer.innerHTML = "";
+          addPlayerInput();
+          currentCardImage.src = "";
+          currentCardImage.alt = "";
+          playerScores = [];
+          currentHole = 0;
+          scoreboardBody.innerHTML = "";
+        }
+      });
+
+      addPlayerInput();
+      splashScreen.style.display = "block";
+    });
+  </script>
+<h6>v 0.7.5.11</h6>
+</body>
+</html>
+
+
