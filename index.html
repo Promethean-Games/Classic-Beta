@@ -3,94 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Par for the Course - Classic</title>
+    <title>Par for the Course - Scoring</title>
     <style>
-    body {
+        body {
       font-family: Arial, sans-serif;
       background-color: #000;
       color: #fff;
       text-align: center;
     }
-
-    #splash-screen, #player-setup, #game-area {
-      max-width: 400px;
-      margin: 20px auto;
-      display: none;
-    }
-
-    #splash-screen img {
-      width: 100%;
-      max-width: 300px;
-    }
-
-    input[type="text"] {
-      width: 80%;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      background-color: #d11111;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .btn:hover {
-      background-color: #a50e0e;
-    }
-
-    #scoreboard, #box-score {
-      text-align: left;
-      margin-top: 20px;
-    }
-
-    .scoreboard-row, .box-score-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 5px 0;
-    }
-
-    .btn-small {
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-
-    .card-image {
-      width: 100%;
-      max-width: 400px;
-      margin: 20px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
-
-    table, th, td {
-      border: 1px solid white;
-    }
-
-    th, td {
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #444;
-    }
-
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        td {
+            border: 1px solid #d11111;
+            padding: 8px;
+            text-align: center;
+        }
+        .btn {
+            background-color: #d11111;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 2px;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .score-controls-row {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <h1>Par for the Course - Classic</h1>
     <div id="splash-screen">
-            <img src="images/Splash-Screen.png" alt="Splash Screen">
-        <button id="start-game" class="btn">Start Game</button>
+        <img src="images/Splash-Screen.png" alt="Splash Screen">
+        <button id="start-game" class="btn">Start</button>
     </div>
 
     <div id="game-container" style="display: none;">
@@ -156,10 +107,6 @@
                 if (holeIndex >= 0 && holeIndex < totalCards && playerIndex >= 0 && playerIndex < playerScores.length) {
                     playerScores[playerIndex].scores[holeIndex] += adjustment;
 
-                    if (playerScores[playerIndex].scores[holeIndex] < 0) {
-                        playerScores[playerIndex].scores[holeIndex] = 0;
-                    }
-
                     console.log(`Adjusting Player ${playerIndex + 1}, Hole ${holeIndex + 1}, by ${adjustment}`);
                     updateBoxScore();
                 } else {
@@ -195,11 +142,11 @@
                     renderScoreButtons();
                     updateBoxScore();
                 } else {
-                    alert("You have completed all 18 cards!");
+                    alert("GAME OVER");
                 }
             });
         });
     </script>
-  <h6>v 0.7.5.3</h6>
+    <h6>v 0.7.5.5</h6>
 </body>
 </html>
