@@ -30,7 +30,7 @@
     }
 
     .btn {
-      padding: 20px 20px;
+      padding: 10px 20px;
       background-color: #d11111;
       color: white;
       border: none;
@@ -57,6 +57,15 @@
     .btn-small {
       padding: 5px 10px;
       font-size: 12px;
+      background-color: #d11111;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-small:hover {
+      background-color: #a50e0e;
     }
 
     .card-image {
@@ -89,15 +98,15 @@
   <!-- Splash Screen -->
   <div id="splash-screen">
     <img src="images/Splash-Screen.png" alt="Splash Screen">
-    <button id="start-btn" class="btn">NEXT</button>
+    <button id="start-btn" class="btn">Start</button>
   </div>
 
   <!-- Player Setup Section -->
   <div id="player-setup">
     <h2>Enter Player Names</h2>
     <div id="player-inputs"></div>
-    <button id="add-player-btn" class="btn">ADD PLAYER</button>
-    <button id="start-game-btn" class="btn">START</button>
+    <button id="add-player-btn" class="btn">Add Player</button>
+    <button id="start-game-btn" class="btn">Start Game</button>
   </div>
 
   <!-- Game Area Section -->
@@ -108,26 +117,6 @@
       <table id="box-score-table">
         <thead>
           <tr>
-            <th>Player</th>
-            <th>Hole 1</th>
-            <th>Hole 2</th>
-            <th>Hole 3</th>
-            <th>Hole 4</th>
-            <th>Hole 5</th>
-            <th>Hole 6</th>
-            <th>Hole 7</th>
-            <th>Hole 8</th>
-            <th>Hole 9</th>
-            <th>Hole 10</th>
-            <th>Hole 11</th>
-            <th>Hole 12</th>
-            <th>Hole 13</th>
-            <th>Hole 14</th>
-            <th>Hole 15</th>
-            <th>Hole 16</th>
-            <th>Hole 17</th>
-            <th>Hole 18</th>
-            
             <!-- Continue up to Hole 18 -->
           </tr>
         </thead>
@@ -188,7 +177,10 @@
       };
 
       const updateScore = (playerIndex, value) => {
-        playerScores[playerIndex].scores[currentHole] = (playerScores[playerIndex].scores[currentHole] || 0) + value;
+        if (playerScores[playerIndex].scores[currentHole] === null) {
+          playerScores[playerIndex].scores[currentHole] = 0;
+        }
+        playerScores[playerIndex].scores[currentHole] += value;
         updateBoxScore();
       };
 
@@ -251,7 +243,7 @@
       });
 
       restartButton.addEventListener("click", function () {
-        if (confirm("Are you sure you want to restart the game?")) {
+        if (confirm("Restarting will clear all player names and scores. Do you wish to continue?")) {
           location.reload();
         }
       });
@@ -259,6 +251,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.4.19</h6>
+  <h6>v 0.7.4.20</h6>
 </body>
 </html>
