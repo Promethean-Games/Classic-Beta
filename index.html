@@ -105,7 +105,6 @@
     <img id="current-card" class="card-image" src="" alt="Card Image">
     <div id="scoreboard"></div>
     <div id="box-score">
-      <h3>Box Score</h3>
       <table id="box-score-table">
         <tbody>
           <!-- Rows populated dynamically -->
@@ -164,6 +163,7 @@
 
       const adjustScore = (playerIndex, holeIndex, adjustment) => {
         const player = playerScores[playerIndex];
+        // Ensure the score for the current hole is updated
         player.scores[holeIndex] = (player.scores[holeIndex] || 0) + adjustment;
         updateBoxScore();
       };
@@ -252,6 +252,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.5</h6>
+  <h6>v 0.7.5.1</h6>
 </body>
 </html>
