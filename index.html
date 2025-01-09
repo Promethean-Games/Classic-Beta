@@ -57,15 +57,6 @@
     .btn-small {
       padding: 5px 10px;
       font-size: 12px;
-      background-color: #d11111;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .btn-small:hover {
-      background-color: #a50e0e;
     }
 
     .card-image {
@@ -114,6 +105,7 @@
     <img id="current-card" class="card-image" src="" alt="Card Image">
     <div id="scoreboard"></div>
     <div id="box-score">
+      <h3>Box Score</h3>
       <table id="box-score-table">
         <thead>
           <tr>
@@ -152,6 +144,25 @@
         const randomIndex = Math.floor(Math.random() * cardImages.length);
         currentCardImage.src = cardImages[randomIndex];
         currentCardImage.alt = `Card ${randomIndex + 1}`;
+        renderScoreButtons();
+      };
+
+      const renderScoreButtons = () => {
+        playerScores.forEach((player, index) => {
+          const scoreControls = document.createElement("div");
+          scoreControls.classList.add("score-controls");
+          scoreControls.innerHTML = `
+            <button class="btn btn-small" onclick="adjustScore(${index}, ${currentHole}, 1)">+1</button>
+            <button class="btn btn-small" onclick="adjustScore(${index}, ${currentHole}, -1)">-1</button>
+          `;
+          scoreboard.appendChild(scoreControls);
+        });
+      };
+
+      const adjustScore = (playerIndex, holeIndex, adjustment) => {
+        const player = playerScores[playerIndex];
+        player.scores[holeIndex] = (player.scores[holeIndex] || 0) + adjustment;
+        updateBoxScore();
       };
 
       const updateBoxScore = () => {
@@ -160,7 +171,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${player.name}</td>
-            ${player.scores.map(score => `<td>${score !== null ? score : 0}</td>`).join("")}
+            ${player.scores.map(score => `<td>${score || 0}</td>`).join("")}
           `;
           boxScoreTable.appendChild(row);
         });
@@ -174,14 +185,6 @@
           <input type="text" placeholder="Player ${playerCount}" />
         `;
         playerInputsContainer.appendChild(playerDiv);
-      };
-
-      const updateScore = (playerIndex, value) => {
-        if (playerScores[playerIndex].scores[currentHole] === null) {
-          playerScores[playerIndex].scores[currentHole] = 0;
-        }
-        playerScores[playerIndex].scores[currentHole] += value;
-        updateBoxScore();
       };
 
       startButton.addEventListener("click", function () {
@@ -207,7 +210,7 @@
 
         playerScores = playerNames.map(name => ({
           name,
-          scores: Array(18).fill(null)
+          scores: Array(18).fill(0) // Default all scores to 0
         }));
 
         playerSetup.style.display = "none";
@@ -226,24 +229,16 @@
 
         currentHole++;
 
-        // Dynamically generate score adjustment buttons for the current hole
-        scoreboard.innerHTML = playerScores.map((player, index) => {
-          return `
-            <div class="scoreboard-row">
-              <span>${player.name}</span>
-              <button class="btn-small" onclick="updateScore(${index}, 1)">+1</button>
-              <button class="btn-small" onclick="updateScore(${index}, -1)">-1</button>
-              <span>Current Score: ${player.scores[currentHole] !== null ? player.scores[currentHole] : 0}</span>
-            </div>
-          `;
-        }).join("");
+        playerScores.forEach(player => {
+          player.scores[currentHole - 1] = player.scores[currentHole - 1] || 0;
+        });
 
         updateBoxScore();
         displayRandomCard();
       });
 
       restartButton.addEventListener("click", function () {
-        if (confirm("Restarting will clear all player names and scores. Do you wish to continue?")) {
+        if (confirm("This will CLEAR ALL player names and scores. Do you wish to continue?")) {
           location.reload();
         }
       });
@@ -251,6 +246,6 @@
       splashScreen.style.display = "block";
     });
   </script>
-  <h6>v 0.7.4.20</h6>
+  <h6>v 0.7.4.21</h6>
 </body>
 </html>
