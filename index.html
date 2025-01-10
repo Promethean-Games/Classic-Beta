@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Par for the Course - Classic</title>
-  <style>
+    <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #000;
@@ -84,13 +84,14 @@
       background-color: #444;
     }
 
-#box-score {
-    display: none; /* Hide the box score by default */
-    transition: max-height 0.3s ease-out;
-}
-#box-score.expanded {
-    display: table; /* Show the box score when expanded */
-}
+    #box-score {
+      display: none;
+      transition: max-height 0.3s ease-out;
+    }
+
+    #box-score.expanded {
+      display: table;
+    }
     </style>
 </head>
 <body>
@@ -116,7 +117,7 @@
 <script>
     // Global Variables
     let playerScores = []; // Define playerScores to avoid errors
-    const gameContainer = document.getElementById("gamecontainer"); // Correct case-sensitive ID
+    const gameContainer = document.getElementById("gamecontainer");
     const boxScoreTable = document.getElementById("box-score");
 
     // Splash Screen: Move to Player Setup
@@ -201,8 +202,6 @@
     });
 </script>
 
-
-    <h6>v 0.7.5.12</h6>
+    <h6>v 0.7.5.14</h6>
 </body>
 </html>
-
