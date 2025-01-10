@@ -86,6 +86,22 @@
             border-collapse: collapse;
         }
 
+        #box-score-wrapper table {
+    width: 100%;
+    max-width: 400px;
+    border-collapse: collapse;
+}
+
+#box-score-wrapper td, #box-score-wrapper th {
+    border: 1px solid #fff;
+    padding: 8px;
+    text-align: center;
+}
+
+#box-score-wrapper th {
+    background-color: #d11111;
+}
+
         #box-score td, #box-score th {
             border: 1px solid #fff;
             padding: 8px;
@@ -128,6 +144,10 @@
         <button id="restart-game" class="btn">Restart</button>
         <button id="reset-scores" class="btn">Reset Scores</button>
         <button id="toggle-box-score" class="btn">Show Box Score</button>
+        <div id="box-score-wrapper" style="display: none;">
+    <table id="box-score-1-9"></table>
+    <table id="box-score-10-18" style="margin-top: 20px;"></table>
+</div>
         <table id="box-score" style="display: none;"></table>
     </div>
     <script>
@@ -179,39 +199,59 @@
         };
 
         // Update Box Score Table
-        const updateBoxScore = () => {
-            const boxScore = document.getElementById("box-score");
-            boxScore.innerHTML = `
-                <tr>
-                    <th>Player</th>
-                    ${Array.from({ length: 18 }, (_, i) => `<th>${i + 1}</th>`).join("")}
-                    <th>Total</th>
-                </tr>
-                ${playerScores.map(player => `
-                    <tr>
-                        <td>${player.name}</td>
-                        ${player.scores.map(score => `<td>${score}</td>`).join("")}
-                        <td>${player.totalScore}</td>
-                    </tr>
-                `).join("")}
-            `;
-        };
+const updateBoxScore = () => {
+    const boxScoreWrapper = document.getElementById("box-score-wrapper");
+    const boxScore1to9 = document.getElementById("box-score-1-9");
+    const boxScore10to18 = document.getElementById("box-score-10-18");
+
+    // Populate Holes 1-9
+    boxScore1to9.innerHTML = `
+        <tr>
+            <th>Player</th>
+            ${Array.from({ length: 9 }, (_, i) => `<th>${i + 1}</th>`).join("")}
+            <th>Total</th>
+        </tr>
+        ${playerScores.map(player => `
+            <tr>
+                <td>${player.name}</td>
+                ${player.scores.slice(0, 9).map(score => `<td>${score}</td>`).join("")}
+                <td>${player.totalScore}</td>
+            </tr>
+        `).join("")}
+    `;
+
+    // Populate Holes 10-18
+    boxScore10to18.innerHTML = `
+        <tr>
+            <th>Player</th>
+            ${Array.from({ length: 9 }, (_, i) => `<th>${i + 10}</th>`).join("")}
+            <th>Total</th>
+        </tr>
+        ${playerScores.map(player => `
+            <tr>
+                <td>${player.name}</td>
+                ${player.scores.slice(9).map(score => `<td>${score}</td>`).join("")}
+                <td>${player.totalScore}</td>
+            </tr>
+        `).join("")}
+    `;
+};
 
         // Toggle Box Score Visibility
-        const toggleBoxScore = () => {
-            const boxScoreTable = document.getElementById("box-score");
-            const toggleButton = document.getElementById("toggle-box-score");
+       const toggleBoxScore = () => {
+    const boxScoreWrapper = document.getElementById("box-score-wrapper");
+    const toggleButton = document.getElementById("toggle-box-score");
 
-            isBoxScoreVisible = !isBoxScoreVisible;
+    isBoxScoreVisible = !isBoxScoreVisible;
 
-            if (isBoxScoreVisible) {
-                boxScoreTable.style.display = "table";
-                toggleButton.textContent = "Hide Box Score";
-            } else {
-                boxScoreTable.style.display = "none";
-                toggleButton.textContent = "Show Box Score";
-            }
-        };
+    if (isBoxScoreVisible) {
+        boxScoreWrapper.style.display = "block";
+        toggleButton.textContent = "Hide Box Score";
+    } else {
+        boxScoreWrapper.style.display = "none";
+        toggleButton.textContent = "Show Box Score";
+    }
+};
 
         // Restart Game
         const restartGame = () => {
