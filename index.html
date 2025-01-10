@@ -5,110 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Par for the Course - Classic</title>
     <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
-      text-align: center;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+        }
 
-    #splash-screen, #player-setup, #game-area {
-      max-width: 400px;
-      margin: 20px auto;
-      display: none;
-    }
+        #splash-screen, #player-setup, #game-area {
+            max-width: 400px;
+            margin: 20px auto;
+            display: none;
+        }
 
-    #splash-screen img {
-      width: 100%;
-      max-width: 300px;
-    }
+        #splash-screen img {
+            width: 100%;
+            max-width: 300px;
+        }
 
-    input[type="text"] {
-      width: 80%;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
 
-    .btn {
-      padding: 10px 20px;
-      background-color: #d11111;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+        .btn {
+            padding: 10px 20px;
+            background-color: #d11111;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    .btn:hover {
-      background-color: #a50e0e;
-    }
+        .btn:hover {
+            background-color: #a50e0e;
+        }
 
-    .player-scoreboard {
-      text-align: left;
-      margin: 20px 0;
-    }
+        .player-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+        }
 
-    .player-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 10px 0;
-    }
-        
-// Incremental button pairs 
-    .btn-small {
-      padding: 5px 10px;
-      font-size: 12px;
-      background-color: #d11111;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin: 0 5px;
-}
+        .increment-btns {
+            display: flex;
+            justify-content: center;
+            background-color: #d11111;
+            color: white;
+            gap: 5px;
+            margin: 10px 0;
+        }
 
-    .card-image {
-      width: 100%;
-      max-width: 400px;
-      margin: 20px 0;
-    }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            background-color: #d11111;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-    }
+        .btn-small:hover {
+            background-color: #a50e0e;
+        }
 
-    table, th, td {
-      border: 1px solid white;
-    }
+        .card-image {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+        }
 
-    th, td {
-      padding: 8px;
-      text-align: center;
-    }
+        #box-score {
+            margin: 20px auto;
+            width: 100%;
+            max-width: 400px;
+            border-collapse: collapse;
+        }
 
-    th {
-      background-color: #444;
-    }
+        #box-score td, #box-score th {
+            border: 1px 
+            padding: 8px;
+            text-align: center;
+        }
 
-    #box-score {
-      display: none;
-      transition: max-height 0.3s ease-out;
-    }
-
-    #box-score.expanded {
-      display: table;
-    }
-
-    .total-score {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
+        #box-score th {
+            background-color: #d11111;
+        }
     </style>
 </head>
 <body>
-    <div id="splash-screen" style="display: block;">
-        <img src="images/Splash-Screen.png" alt="Splash Screen" width="300px" height="auto">
+    <div id="splash-screen">
+        <img src="images/Splash-Screen.png" alt="Splash Screen">
         <button id="setup-game" class="btn">Next</button>
     </div>
 
@@ -116,166 +105,153 @@
         <h2>Enter Player Names</h2>
         <div id="player-inputs">
             <div>
-                <input type="text" class="player-name-input" placeholder="Player 1">
+                <input type="text" class="player-name-input">
             </div>
         </div>
         <button id="add-player" class="btn">Add Player</button>
         <button id="start-game" class="btn">Start Game</button>
     </div>
 
-    <div id="gamecontainer" style="display: none;">
+    <div id="game-area" style="display: none;">
+        <h2>Current Card</h2>
         <img id="current-card" class="card-image" src="" alt="Card Image">
-        <div id="player-scores" class="player-scoreboard"></div>
-        <button id="next-hole" class="btn">Next Card</button>
-        <button id="toggle-box-score" class="btn">Toggle Box Score</button>
+        <div id="player-scores"></div>
+        <div id="increment-buttons"></div>
         <table id="box-score"></table>
+        <button id="next-hole" class="btn">Next Card</button>
+        <button id="restart-game" class="btn">Restart</button>
     </div>
 
-<script>
-    // Global Variables
-    let playerScores = [];
-    let shuffledCards = [];
-    let currentCardIndex = 0;
-    const gameContainer = document.getElementById("gamecontainer");
-    const boxScoreTable = document.getElementById("box-score");
-    const playerScoresDiv = document.getElementById("player-scores");
+    <script>
+        // Global Variables
+        let playerScores = [];
+        let currentCardIndex = 0;
 
-    // Array of card images (card1.png to card18.png)
-    const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
+        // Array of Card Images (Preloading)
+        const cardImages = Array.from({ length: 18 }, (_, i) => {
+            const img = new Image();
+            img.src = `images/card${i + 1}.png`;
+            return img;
+        });
 
-    // Shuffle the card images array
-    const shuffleCards = () => {
-        shuffledCards = [...cardImages];
-        for (let i = shuffledCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]];
-        }
-    };
+        // Shuffle Cards
+        const shuffleCards = () => {
+            for (let i = cardImages.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardImages[i], cardImages[j]] = [cardImages[j], cardImages[i]];
+            }
+        };
 
-    // Splash Screen: Move to Player Setup
-    const splashScreen = document.getElementById("splash-screen");
-    const setupGameButton = document.getElementById("setup-game");
-    const playerSetup = document.getElementById("player-setup");
+        // Update Game Display
+        const updateGameDisplay = () => {
+            const currentCard = cardImages[currentCardIndex];
+            document.getElementById("current-card").src = currentCard.src;
 
-    setupGameButton.addEventListener("click", () => {
-        splashScreen.style.display = "none";
-        playerSetup.style.display = "block";
-    });
-
-    // Add Player Functionality
-    const addPlayerButton = document.getElementById("add-player");
-    const playerInputsContainer = document.getElementById("player-inputs");
-
-    addPlayerButton.addEventListener("click", () => {
-        const playerInputField = document.createElement("div");
-        playerInputField.innerHTML = `
-            <input type="text" class="player-name-input">
-        `;
-        playerInputsContainer.appendChild(playerInputField);
-    });
-
-    // Start Game Functionality
-    const startGameButton = document.getElementById("start-game");
-
-    startGameButton.addEventListener("click", () => {
-        const playerNames = Array.from(document.querySelectorAll(".player-name-input"))
-            .map(input => input.value.trim())
-            .filter(name => name.length > 0);
-
-        if (playerNames.length > 0) {
-            playerScores = playerNames.map(name => ({
-                name,
-                scores: Array(18).fill(0), // Default to 18 holes
-            }));
-
-            playerSetup.style.display = "none";
-            gameContainer.style.display = "block";
-
-            shuffleCards(); // Shuffle cards before starting the game
-            updateBoxScore();
-            displayPlayerScores();
-            showNextCard(); // Show the first card
-        } else {
-            alert("Please add at least one player.");
-        }
-    });
-
-    // Update Player Scores Display
-    const displayPlayerScores = () => {
-        playerScoresDiv.innerHTML = "";
-        playerScores.forEach((player, index) => {
-            const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
-            const playerRow = document.createElement("div");
-            playerRow.classList.add("player-row");
-            playerRow.innerHTML = `
-                <span>${player.name}: ${totalScore}</span>
-                <div>
-                    <button class="btn-small" onclick="adjustScore(${index}, -1)">-1</button>
-                    <button class="btn-small" onclick="adjustScore(${index}, 1)">+1</button>
+            const playerScoresDiv = document.getElementById("player-scores");
+            playerScoresDiv.innerHTML = playerScores.map(player => `
+                <div class="player-score">
+                    <span>${player.name}: ${player.scores.reduce((a, b) => a + b, 0)}</span>
                 </div>
+            `).join("");
+
+            const incrementButtonsDiv = document.getElementById("increment-buttons");
+            incrementButtonsDiv.innerHTML = playerScores.map((player, idx) => `
+                <div class="increment-btns">
+                    <button class="btn-small" onclick="adjustScore(${idx}, 1)">+1</button>
+                    <button class="btn-small" onclick="adjustScore(${idx}, -1)">-1</button>
+                </div>
+            `).join("");
+
+            updateBoxScore();
+        };
+
+        // Adjust Player Scores
+        const adjustScore = (playerIndex, adjustment) => {
+            playerScores[playerIndex].scores[currentCardIndex] += adjustment;
+            updateGameDisplay();
+        };
+
+        // Update Box Score Table
+        const updateBoxScore = () => {
+            const boxScore = document.getElementById("box-score");
+            boxScore.innerHTML = `
+                <tr>
+                    <th>Player</th>
+                    <th>Total</th>
+                </tr>
+                ${playerScores.map(player => `
+                    <tr>
+                        <td>${player.name}</td>
+                        <td>${player.scores.reduce((a, b) => a + b, 0)}</td>
+                    </tr>
+                `).join("")}
             `;
-            playerScoresDiv.appendChild(playerRow);
+        };
+
+        // Restart Game
+        const restartGame = () => {
+            playerScores = [];
+            currentCardIndex = 0;
+            shuffleCards();
+            document.getElementById("splash-screen").style.display = "block";
+            document.getElementById("player-setup").style.display = "none";
+            document.getElementById("game-area").style.display = "none";
+        };
+
+        // Event Listeners
+        document.getElementById("setup-game").addEventListener("click", () => {
+            document.getElementById("splash-screen").style.display = "none";
+            document.getElementById("player-setup").style.display = "block";
         });
-    };
 
-    // Update Box Score Table
-    const updateBoxScore = () => {
-        boxScoreTable.innerHTML = "";
-
-        // Header Row
-        const headerRow = document.createElement("tr");
-        headerRow.innerHTML = `<td>Player</td>` +
-            playerScores[0].scores.map((_, i) => `<td>Hole ${i + 1}</td>`).join("") +
-            `<td>Total</td>`;
-        boxScoreTable.appendChild(headerRow);
-
-        // Player Rows
-        playerScores.forEach(player => {
-            const row = document.createElement("tr");
-            const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
-            row.innerHTML = `
-                <td>${player.name}</td>
-                ${player.scores.map(score => `<td>${score}</td>`).join("")}
-                <td>${totalScore}</td>
+        document.getElementById("add-player").addEventListener("click", () => {
+            const playerInputs = document.getElementById("player-inputs");
+            const playerInputField = document.createElement("div");
+            playerInputField.innerHTML = `
+                <label>Player Name:</label>
+                <input type="text" class="player-name-input" placeholder="Player Name">
             `;
-            boxScoreTable.appendChild(row);
+            playerInputs.appendChild(playerInputField);
         });
-    };
 
-    // Adjust Score Function
-    const adjustScore = (playerIndex, adjustment) => {
-        playerScores[playerIndex].scores[currentCardIndex - 1] += adjustment;
-        displayPlayerScores();
-        updateBoxScore();
-    };
+        document.getElementById("start-game").addEventListener("click", () => {
+            const playerNames = Array.from(document.querySelectorAll(".player-name-input"))
+                .map(input => input.value.trim())
+                .filter(name => name.length > 0);
 
-    // Show the next card in the shuffled order
-    const showNextCard = () => {
-        if (currentCardIndex < shuffledCards.length) {
-            const cardImage = shuffledCards[currentCardIndex];
-            document.getElementById("current-card").src = cardImage;
-            currentCardIndex++;
-        } else {
-            alert("GAME OVER");
-            currentCardIndex = 0; // Reset the game
-        }
-    };
+            if (playerNames.length > 0) {
+                playerScores = playerNames.map(name => ({
+                    name,
+                    scores: Array(18).fill(0)
+                }));
 
-    // Next Card Button
-    const nextCardButton = document.getElementById("next-hole");
-    nextCardButton.addEventListener("click", showNextCard);
+                document.getElementById("player-setup").style.display = "none";
+                document.getElementById("game-area").style.display = "block";
 
-    // Toggle Box Score Visibility
-    const toggleBoxScoreButton = document.getElementById("toggle-box-score");
-    toggleBoxScoreButton.addEventListener("click", () => {
-        boxScoreTable.classList.toggle("expanded");
-    });
-</script>
+                shuffleCards();
+                updateGameDisplay();
+            } else {
+                alert("Please add at least one player.");
+            }
+        });
 
-    <h6>v 0.7.7.1</h6>
+        document.getElementById("next-hole").addEventListener("click", () => {
+            if (currentCardIndex < cardImages.length - 1) {
+                currentCardIndex++;
+                updateGameDisplay();
+            } else {
+                alert("GAME OVER");
+            }
+        });
+
+        document.getElementById("restart-game").addEventListener("click", restartGame);
+
+        // Initial Setup
+        document.addEventListener("DOMContentLoaded", () => {
+            shuffleCards();
+        });
+    </script>
+
+    <h6>v 0.7.7.2</h6>
 </body>
 </html>
-
-
-
-
