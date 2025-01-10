@@ -46,16 +46,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 5px 0;
+            margin: 10px 0;
+        }
+
+        .player-name {
+            flex: 1;
+            text-align: left;
         }
 
         .increment-btns {
             display: flex;
-            justify-content: center;
-            background-color: #d11111;
-            color: white;
             gap: 5px;
-            margin: 10px 0;
+            align-items: center;
         }
 
         .btn-small {
@@ -122,18 +124,12 @@
         <h2>Current Card</h2>
         <img id="current-card" class="card-image" src="images/card1.png" alt="Card Image">
         <div id="player-scores"></div>
-        <div id="increment-buttons"></div>
         <button id="next-hole" class="btn">Next Card</button>
         <button id="restart-game" class="btn">Restart</button>
         <button id="reset-scores" class="btn">Reset Scores</button>
         <button id="toggle-box-score" class="btn">Show Box Score</button>
         <table id="box-score" style="display: none;"></table>
     </div>
-
-    <footer>
-        <h6>v 0.7.7.2</h6>
-    </footer>
-
     <script>
         // Global Variables
         let playerScores = [];
@@ -161,17 +157,13 @@
             document.getElementById("current-card").src = currentCard.src;
 
             const playerScoresDiv = document.getElementById("player-scores");
-            playerScoresDiv.innerHTML = playerScores.map(player => `
+            playerScoresDiv.innerHTML = playerScores.map((player, idx) => `
                 <div class="player-score">
-                    <span>${player.name}: ${player.totalScore}</span>
-                </div>
-            `).join("");
-
-            const incrementButtonsDiv = document.getElementById("increment-buttons");
-            incrementButtonsDiv.innerHTML = playerScores.map((player, idx) => `
-                <div class="increment-btns">
-                    <button class="btn-small" onclick="adjustScore(${idx}, 1)">+1</button>
-                    <button class="btn-small" onclick="adjustScore(${idx}, -1)">-1</button>
+                    <span class="player-name">${player.name}: ${player.totalScore}</span>
+                    <div class="increment-btns">
+                        <button class="btn-small" onclick="adjustScore(${idx}, 1)">+1</button>
+                        <button class="btn-small" onclick="adjustScore(${idx}, -1)">-1</button>
+                    </div>
                 </div>
             `).join("");
 
@@ -266,7 +258,7 @@
             const uniqueNames = new Set(playerNames.filter(name => name.length > 0));
 
             if (uniqueNames.size !== playerNames.length) {
-                alert("Player names cannot be empty and must be unique (no duplicates).");
+                alert("Player names must be unique and not empty.");
                 return;
             }
 
@@ -295,10 +287,9 @@
         document.getElementById("reset-scores").addEventListener("click", resetScores);
         document.getElementById("toggle-box-score").addEventListener("click", toggleBoxScore);
 
-        // Initialize
-        shuffleCards();
+        // Initial Display
         document.getElementById("splash-screen").style.display = "block";
     </script>
 </body>
-    <footer>v 0.7.8.3</footer>
+    <footer>v 0.7.8.5</footer>
 </html>
