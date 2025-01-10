@@ -65,114 +65,95 @@
     </div>
 
 <script>
-    // Add Player Setup Area
-    const addPlayerSetupArea = () => {
-        // Create Player Setup Section
-        const playerSetupContainer = document.getElementById("player-setup") || document.createElement("div");
-        playerSetupContainer.id = "player-setup";
-        if (!document.getElementById("player-setup")) {
-            playerSetupContainer.innerHTML = `
-                <h3>Player Setup</h3>
-                <div id="player-inputs-container"></div>
-                <button id="add-player-btn" class="btn">Add Player</button>
-                <button id="start-game-btn" class="btn">Start Game</button>
-            `;
-            gameContainer.insertBefore(playerSetupContainer, boxScoreTable);
+    // Global Variables
+    let playerScores = []; // Define playerScores to avoid errors
+    const gameContainer = document.getElementById("gamecontainer"); // Correct case-sensitive ID
+    const boxScoreTable = document.getElementById("box-score");
+
+    // Splash Screen: Move to Player Setup
+    const splashScreen = document.getElementById("splash-screen");
+    const setupGameButton = document.getElementById("setup-game");
+    const playerSetup = document.getElementById("player-setup");
+
+    setupGameButton.addEventListener("click", () => {
+        splashScreen.style.display = "none";
+        playerSetup.style.display = "block";
+    });
+
+    // Add Player Functionality
+    const addPlayerButton = document.getElementById("add-player");
+    const playerInputsContainer = document.getElementById("player-inputs");
+
+    addPlayerButton.addEventListener("click", () => {
+        const playerInputField = document.createElement("div");
+        playerInputField.innerHTML = `
+            <label>Player Name:</label>
+            <input type="text" class="player-name-input" placeholder="Player Name">
+        `;
+        playerInputsContainer.appendChild(playerInputField);
+    });
+
+    // Start Game Functionality
+    const startGameButton = document.getElementById("start-game");
+
+    startGameButton.addEventListener("click", () => {
+        const playerNames = Array.from(document.querySelectorAll(".player-name-input"))
+            .map(input => input.value.trim())
+            .filter(name => name.length > 0);
+
+        if (playerNames.length > 0) {
+            playerScores = playerNames.map(name => ({
+                name,
+                scores: Array(9).fill(0), // Default to 9 holes
+            }));
+
+            playerSetup.style.display = "none";
+            gameContainer.style.display = "block";
+
+            updateBoxScore();
+        } else {
+            alert("Please add at least one player.");
         }
+    });
 
-        // Handle Add Player Button Click
-        const addPlayerBtn = document.getElementById("add-player-btn");
-        const playerInputsContainer = document.getElementById("player-inputs-container");
-
-        addPlayerBtn.addEventListener("click", () => {
-            const playerInputField = document.createElement("div");
-            playerInputField.classList.add("player-input-field");
-            playerInputField.innerHTML = `
-                <label>Player Name:</label>
-                <input type="text" class="player-name-input" placeholder="Player 1">
-            `;
-            playerInputsContainer.appendChild(playerInputField);
-        });
-
-        // Handle Start Game Button Click
-        const startGameBtn = document.getElementById("start-game-btn");
-        startGameBtn.addEventListener("click", () => {
-            const playerNames = Array.from(document.querySelectorAll(".player-name-input"))
-                .map(input => input.value.trim())
-                .filter(name => name.length > 0);
-
-            if (playerNames.length > 0) {
-                // Initialize playerScores based on input names
-                playerScores = playerNames.map(name => ({
-                    name,
-                    scores: Array(playerNames.length).fill(0), // Adjust number of holes here if necessary
-                }));
-
-                // Remove the player setup section after starting the game
-                playerSetupContainer.remove();
-
-                // Now we can update the box score display
-                updateBoxScore();
-            } else {
-                alert("Please enter at least one player name.");
-            }
-        });
-    };
-
-    // Call the setup function when the page loads
-    addPlayerSetupArea();
-
-    // Existing updateBoxScore function...
+    // Update Box Score Table
     const updateBoxScore = () => {
-        // Display Total Scores
-        const totalScoresContainer = document.getElementById("total-scores") || document.createElement("div");
-        totalScoresContainer.id = "total-scores";
-        totalScoresContainer.innerHTML = playerScores
-            .map(player => {
-                const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
-                return `<div><strong>${player.name}:</strong> ${totalScore}</div>`;
-            })
-            .join("");
-        gameContainer.insertBefore(totalScoresContainer, boxScoreTable);
-
-        // Update Detailed Box Score Table
         boxScoreTable.innerHTML = "";
 
+        // Header Row
         const headerRow = document.createElement("tr");
-        headerRow.innerHTML = `<td>Player</td>` + 
+        headerRow.innerHTML = `<td>Player</td>` +
             playerScores[0].scores.map((_, i) => `<td>Hole ${i + 1}</td>`).join("") +
             `<td>Total</td>`;
         boxScoreTable.appendChild(headerRow);
 
+        // Player Rows
         playerScores.forEach(player => {
-            const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
             const row = document.createElement("tr");
-            const holeScores = player.scores.map(score => `<td>${score}</td>`).join("");
+            const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
             row.innerHTML = `
                 <td>${player.name}</td>
-                ${holeScores}
+                ${player.scores.map(score => `<td>${score}</td>`).join("")}
                 <td>${totalScore}</td>
             `;
             boxScoreTable.appendChild(row);
         });
     };
 
-    // Add Toggle Button Once
-    let toggleBoxScoreButton = document.getElementById("toggle-box-score");
-    if (!toggleBoxScoreButton) {
-        toggleBoxScoreButton = document.createElement("button");
-        toggleBoxScoreButton.id = "toggle-box-score";
-        toggleBoxScoreButton.classList.add("btn");
-        toggleBoxScoreButton.textContent = "Toggle Box Score";
-        gameContainer.insertBefore(toggleBoxScoreButton, boxScoreTable);
+    // Toggle Box Score Visibility
+    const toggleBoxScoreButton = document.createElement("button");
+    toggleBoxScoreButton.id = "toggle-box-score";
+    toggleBoxScoreButton.textContent = "Toggle Box Score";
+    toggleBoxScoreButton.classList.add("btn");
+    gameContainer.insertBefore(toggleBoxScoreButton, boxScoreTable);
 
-        toggleBoxScoreButton.addEventListener("click", () => {
-            boxScoreTable.classList.toggle("expanded");
-        });
-    }
+    toggleBoxScoreButton.addEventListener("click", () => {
+        boxScoreTable.classList.toggle("expanded");
+    });
 </script>
 
-    <h6>v 0.7.5.10</h6>
+
+    <h6>v 0.7.5.11</h6>
 </body>
 </html>
 
