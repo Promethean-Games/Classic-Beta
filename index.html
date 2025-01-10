@@ -95,14 +95,20 @@
     </style>
 </head>
 <body>
-    <div id="splash-screen" style="display: block;"> <!-- Splash screen visible by default -->
+    <div id="splash-screen" style="display: block;">
         <img src="images/Splash-Screen.png" alt="Splash Screen" width="300px" height="auto">
         <button id="setup-game" class="btn">Next</button>
     </div>
 
     <div id="player-setup" style="display: none;">
         <h2>Enter Player Names</h2>
-        <div id="player-inputs"></div>
+        <div id="player-inputs">
+            <!-- Initial Player Name Input -->
+            <div>
+                <label>Player 1 Name:</label>
+                <input type="text" class="player-name-input" placeholder="Player 1">
+            </div>
+        </div>
         <button id="add-player" class="btn">Add Player</button>
         <button id="start-game" class="btn">Start Game</button>
     </div>
@@ -117,8 +123,22 @@
 <script>
     // Global Variables
     let playerScores = [];
+    let shuffledCards = [];
+    let currentCardIndex = 0;
     const gameContainer = document.getElementById("gamecontainer");
     const boxScoreTable = document.getElementById("box-score");
+
+    // Array of card images (card1.png to card18.png)
+    const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
+
+    // Shuffle the card images array
+    const shuffleCards = () => {
+        shuffledCards = [...cardImages]; // Create a copy to shuffle
+        for (let i = shuffledCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]]; // Swap elements
+        }
+    };
 
     // Splash Screen: Move to Player Setup
     const splashScreen = document.getElementById("splash-screen");
@@ -137,7 +157,7 @@
     addPlayerButton.addEventListener("click", () => {
         const playerInputField = document.createElement("div");
         playerInputField.innerHTML = `
-            <label>Player Name:</label>
+            <label>Enter Player Name(s):</label>
             <input type="text" class="player-name-input" placeholder="Player Name">
         `;
         playerInputsContainer.appendChild(playerInputField);
@@ -154,13 +174,15 @@
         if (playerNames.length > 0) {
             playerScores = playerNames.map(name => ({
                 name,
-                scores: Array(9).fill(0), // Default to 9 holes
+                scores: Array(18).fill(0), // Default to 18 holes
             }));
 
             playerSetup.style.display = "none";
             gameContainer.style.display = "block";
 
+            shuffleCards(); // Shuffle cards before starting the game
             updateBoxScore();
+            showNextCard(); // Show the first card
         } else {
             alert("Please add at least one player.");
         }
@@ -190,6 +212,22 @@
         });
     };
 
+    // Show the next card in the shuffled order
+    const showNextCard = () => {
+        if (currentCardIndex < shuffledCards.length) {
+            const cardImage = shuffledCards[currentCardIndex];
+            document.getElementById("current-card").src = cardImage;
+            currentCardIndex++;
+        } else {
+            alert("GAME OVER");
+            currentCardIndex = 0; // Reset the game
+        }
+    };
+
+    // Next Card Button
+    const nextCardButton = document.getElementById("next-hole");
+    nextCardButton.addEventListener("click", showNextCard);
+
     // Toggle Box Score Visibility
     const toggleBoxScoreButton = document.createElement("button");
     toggleBoxScoreButton.id = "toggle-box-score";
@@ -202,6 +240,6 @@
     });
 </script>
 
-    <h6>v 0.7.5.15</h6>
+    <h6>v 0.7.6.0</h6>
 </body>
 </html>
