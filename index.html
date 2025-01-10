@@ -94,8 +94,10 @@
     }
 
     .increment-decrement {
-      display: inline-block;
-      margin: 0 5px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px 0;
     }
 
     .total-score {
@@ -115,7 +117,8 @@
         <div id="player-inputs">
             <!-- Initial Player Name Input -->
             <div>
-                <input type="text" class="player-name-input" placeholder="Player 1">
+                <label>Player 1 Name:</label>
+                <input type="text" class="player-name-input" placeholder="Player 1 Name">
             </div>
         </div>
         <button id="add-player" class="btn">Add Player</button>
@@ -125,7 +128,10 @@
     <div id="gamecontainer" style="display: none;">
         <div id="total-score" class="total-score"></div>
         <img id="current-card" class="card-image" src="" alt="Card Image">
-        <div id="score-controls"></div>
+        <div id="increment-decrement-controls" class="increment-decrement">
+            <button class="btn-small" id="decrement-score">-1</button>
+            <button class="btn-small" id="increment-score">+1</button>
+        </div>
         <button id="next-hole" class="btn">Next Card</button>
         <button id="toggle-box-score" class="btn">Toggle Box Score</button>
         <table id="box-score"></table>
@@ -185,7 +191,7 @@
         if (playerNames.length > 0) {
             playerScores = playerNames.map(name => ({
                 name,
-                scores: Array(18).fill(0), // Default to 18 holes
+                scores: Array(9).fill(0), // Default to 9 holes
             }));
 
             playerSetup.style.display = "none";
@@ -212,19 +218,12 @@
         boxScoreTable.appendChild(headerRow);
 
         // Player Rows
-        playerScores.forEach((player, playerIndex) => {
+        playerScores.forEach(player => {
             const row = document.createElement("tr");
             const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
             row.innerHTML = `
                 <td>${player.name}</td>
-                ${player.scores.map((score, i) => `
-                    <td>
-                        ${score}
-                        <div class="increment-decrement">
-                            <button class="btn-small" onclick="adjustScore(${playerIndex}, ${i}, -1)">-1</button>
-                            <button class="btn-small" onclick="adjustScore(${playerIndex}, ${i}, 1)">+1</button>
-                        </div>
-                    </td>`).join("")}
+                ${player.scores.map(score => `<td>${score}</td>`).join("")}
                 <td>${totalScore}</td>
             `;
             boxScoreTable.appendChild(row);
@@ -241,8 +240,10 @@
     };
 
     // Adjust Score Function
-    const adjustScore = (playerIndex, holeIndex, adjustment) => {
-        playerScores[playerIndex].scores[holeIndex] += adjustment;
+    const adjustScore = (adjustment) => {
+        playerScores.forEach(player => {
+            player.scores[currentCardIndex] += adjustment;
+        });
         updateBoxScore();
         updateTotalScore();
     };
@@ -268,10 +269,18 @@
     toggleBoxScoreButton.addEventListener("click", () => {
         boxScoreTable.classList.toggle("expanded");
     });
+
+    // Increment/Decrement Buttons
+    const incrementButton = document.getElementById("increment-score");
+    const decrementButton = document.getElementById("decrement-score");
+
+    incrementButton.addEventListener("click", () => adjustScore(1));
+    decrementButton.addEventListener("click", () => adjustScore(-1));
 </script>
 
-    <h6>v 0.7.6.3</h6>
+    <h6>v 0.7.6.4</h6>
 </body>
 </html>
+
 
 
