@@ -48,7 +48,7 @@
 <body>
     <div id="splash-screen">
         <img src="images/Splash-Screen.png" alt="Splash Screen" width=300px height=auto>
-        <button id="setup-game" class="btn">Start</button>
+        <button id="setup-game" class="btn">Next</button>
     </div>
 
     <div id="player-setup" style="display: none;">
@@ -58,7 +58,7 @@
         <button id="start-game" class="btn">Start Game</button>
     </div>
 
-    <div id="game-container" style="display: none;">
+    <div id="gamecontainer" style="display: none;">
         <div id="score-controls"></div>
         <table id="box-score"></table>
         <button id="next-hole" class="btn">Next Card</button>
@@ -77,7 +77,7 @@
                 <button id="add-player-btn" class="btn">Add Player</button>
                 <button id="start-game-btn" class="btn">Start Game</button>
             `;
-            game-Container.insertBefore(playerSetupContainer, boxScoreTable);
+            gameContainer.insertBefore(playerSetupContainer, boxScoreTable);
         }
 
         // Handle Add Player Button Click
@@ -133,7 +133,7 @@
                 return `<div><strong>${player.name}:</strong> ${totalScore}</div>`;
             })
             .join("");
-        game-Container.insertBefore(totalScoresContainer, boxScoreTable);
+        gameContainer.insertBefore(totalScoresContainer, boxScoreTable);
 
         // Update Detailed Box Score Table
         boxScoreTable.innerHTML = "";
@@ -164,7 +164,7 @@
         toggleBoxScoreButton.id = "toggle-box-score";
         toggleBoxScoreButton.classList.add("btn");
         toggleBoxScoreButton.textContent = "Toggle Box Score";
-        game-Container.insertBefore(toggleBoxScoreButton, boxScoreTable);
+        gameContainer.insertBefore(toggleBoxScoreButton, boxScoreTable);
 
         toggleBoxScoreButton.addEventListener("click", () => {
             boxScoreTable.classList.toggle("expanded");
