@@ -92,6 +92,11 @@
     #box-score.expanded {
       display: table;
     }
+
+    .increment-decrement {
+      display: inline-block;
+      margin: 0 5px;
+    }
     </style>
 </head>
 <body>
@@ -101,12 +106,11 @@
     </div>
 
     <div id="player-setup" style="display: none;">
-        <h2>Enter Player Names</h2>
         <div id="player-inputs">
             <!-- Initial Player Name Input -->
             <div>
-                <label>Player 1 Name:</label>
-                <input type="text" class="player-name-input" placeholder="Player 1">
+                <label>Enter Player Names</label>
+                <input type="text" class="player-name-input">
             </div>
         </div>
         <button id="add-player" class="btn">Add Player</button>
@@ -157,7 +161,7 @@
     addPlayerButton.addEventListener("click", () => {
         const playerInputField = document.createElement("div");
         playerInputField.innerHTML = `
-            <label>Enter Player Name(s):</label>
+            <label>Player Name:</label>
             <input type="text" class="player-name-input" placeholder="Player Name">
         `;
         playerInputsContainer.appendChild(playerInputField);
@@ -200,16 +204,37 @@
         boxScoreTable.appendChild(headerRow);
 
         // Player Rows
-        playerScores.forEach(player => {
+        playerScores.forEach((player, playerIndex) => {
             const row = document.createElement("tr");
             const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
             row.innerHTML = `
                 <td>${player.name}</td>
-                ${player.scores.map(score => `<td>${score}</td>`).join("")}
+                ${player.scores.map((score, i) => `
+                    <td>
+                        <div class="increment-decrement">
+                            <button class="btn-small" onclick="decrementScore(${playerIndex}, ${i})">-</button>
+                            ${score}
+                            <button class="btn-small" onclick="incrementScore(${playerIndex}, ${i})">+</button>
+                        </div>
+                    </td>`).join("")}
                 <td>${totalScore}</td>
             `;
             boxScoreTable.appendChild(row);
         });
+    };
+
+    // Increment Player Score
+    const incrementScore = (playerIndex, holeIndex) => {
+        playerScores[playerIndex].scores[holeIndex]++;
+        updateBoxScore();
+    };
+
+    // Decrement Player Score
+    const decrementScore = (playerIndex, holeIndex) => {
+        if (playerScores[playerIndex].scores[holeIndex] > 0) {
+            playerScores[playerIndex].scores[holeIndex]--;
+            updateBoxScore();
+        }
     };
 
     // Show the next card in the shuffled order
@@ -219,7 +244,7 @@
             document.getElementById("current-card").src = cardImage;
             currentCardIndex++;
         } else {
-            alert("GAME OVER");
+            alert("All cards have been shown!");
             currentCardIndex = 0; // Reset the game
         }
     };
@@ -240,6 +265,6 @@
     });
 </script>
 
-    <h6>v 0.7.6.0</h6>
+    <h6>v 0.7.6.1</h6>
 </body>
 </html>
