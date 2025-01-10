@@ -97,6 +97,11 @@
       display: inline-block;
       margin: 0 5px;
     }
+
+    .total-score {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
     </style>
 </head>
 <body>
@@ -106,11 +111,11 @@
     </div>
 
     <div id="player-setup" style="display: none;">
+        <h2>Enter Player Names</h2>
         <div id="player-inputs">
             <!-- Initial Player Name Input -->
             <div>
-                <label>Enter Player Names</label>
-                <input type="text" class="player-name-input">
+                <input type="text" class="player-name-input" placeholder="Player 1">
             </div>
         </div>
         <button id="add-player" class="btn">Add Player</button>
@@ -118,10 +123,12 @@
     </div>
 
     <div id="gamecontainer" style="display: none;">
-      <img id="current-card" class="card-image" src="" alt="Card Image">
+        <div id="total-score" class="total-score"></div>
+        <img id="current-card" class="card-image" src="" alt="Card Image">
         <div id="score-controls"></div>
-        <table id="box-score"></table>
         <button id="next-hole" class="btn">Next Card</button>
+        <button id="toggle-box-score" class="btn">Toggle Box Score</button>
+        <table id="box-score"></table>
     </div>
 
 <script>
@@ -161,7 +168,6 @@
     addPlayerButton.addEventListener("click", () => {
         const playerInputField = document.createElement("div");
         playerInputField.innerHTML = `
-            <label>Player Name:</label>
             <input type="text" class="player-name-input" placeholder="Player Name">
         `;
         playerInputsContainer.appendChild(playerInputField);
@@ -186,6 +192,7 @@
 
             shuffleCards(); // Shuffle cards before starting the game
             updateBoxScore();
+            updateTotalScore();
             showNextCard(); // Show the first card
         } else {
             alert("Please add at least one player.");
@@ -211,11 +218,7 @@
                 <td>${player.name}</td>
                 ${player.scores.map((score, i) => `
                     <td>
-                        <div class="increment-decrement">
-                            <button class="btn-small" onclick="decrementScore(${playerIndex}, ${i})">-</button>
-                            ${score}
-                            <button class="btn-small" onclick="incrementScore(${playerIndex}, ${i})">+</button>
-                        </div>
+                        ${score}
                     </td>`).join("")}
                 <td>${totalScore}</td>
             `;
@@ -223,18 +226,13 @@
         });
     };
 
-    // Increment Player Score
-    const incrementScore = (playerIndex, holeIndex) => {
-        playerScores[playerIndex].scores[holeIndex]++;
-        updateBoxScore();
-    };
-
-    // Decrement Player Score
-    const decrementScore = (playerIndex, holeIndex) => {
-        if (playerScores[playerIndex].scores[holeIndex] > 0) {
-            playerScores[playerIndex].scores[holeIndex]--;
-            updateBoxScore();
-        }
+    // Update Total Score Display
+    const updateTotalScore = () => {
+        let totalScore = 0;
+        playerScores.forEach(player => {
+            totalScore += player.scores.reduce((acc, score) => acc + score, 0);
+        });
+        document.getElementById("total-score").textContent = `Total Score: ${totalScore}`;
     };
 
     // Show the next card in the shuffled order
@@ -254,17 +252,13 @@
     nextCardButton.addEventListener("click", showNextCard);
 
     // Toggle Box Score Visibility
-    const toggleBoxScoreButton = document.createElement("button");
-    toggleBoxScoreButton.id = "toggle-box-score";
-    toggleBoxScoreButton.textContent = "Toggle Box Score";
-    toggleBoxScoreButton.classList.add("btn");
-    gameContainer.insertBefore(toggleBoxScoreButton, boxScoreTable);
-
+    const toggleBoxScoreButton = document.getElementById("toggle-box-score");
     toggleBoxScoreButton.addEventListener("click", () => {
         boxScoreTable.classList.toggle("expanded");
     });
 </script>
 
-    <h6>v 0.7.6.1</h6>
+    <h6>v 0.7.6.2</h6>
 </body>
 </html>
+
