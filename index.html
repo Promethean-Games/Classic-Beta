@@ -42,16 +42,16 @@
       background-color: #a50e0e;
     }
 
-    #scoreboard, #box-score {
+    .player-scoreboard {
       text-align: left;
-      margin-top: 20px;
+      margin: 20px 0;
     }
 
-    .scoreboard-row, .box-score-row {
+    .player-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 5px 0;
+      margin: 10px 0;
     }
 
     .btn-small {
@@ -93,13 +93,6 @@
       display: table;
     }
 
-    .increment-decrement {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px 0;
-    }
-
     .total-score {
       font-size: 24px;
       margin-bottom: 20px;
@@ -115,10 +108,8 @@
     <div id="player-setup" style="display: none;">
         <h2>Enter Player Names</h2>
         <div id="player-inputs">
-            <!-- Initial Player Name Input -->
             <div>
-                <label>Player 1 Name:</label>
-                <input type="text" class="player-name-input" placeholder="Player 1 Name">
+                <input type="text" class="player-name-input" placeholder="Player 1">
             </div>
         </div>
         <button id="add-player" class="btn">Add Player</button>
@@ -126,12 +117,8 @@
     </div>
 
     <div id="gamecontainer" style="display: none;">
-        <div id="total-score" class="total-score"></div>
         <img id="current-card" class="card-image" src="" alt="Card Image">
-        <div id="increment-decrement-controls" class="increment-decrement">
-            <button class="btn-small" id="decrement-score">-1</button>
-            <button class="btn-small" id="increment-score">+1</button>
-        </div>
+        <div id="player-scores" class="player-scoreboard"></div>
         <button id="next-hole" class="btn">Next Card</button>
         <button id="toggle-box-score" class="btn">Toggle Box Score</button>
         <table id="box-score"></table>
@@ -144,16 +131,17 @@
     let currentCardIndex = 0;
     const gameContainer = document.getElementById("gamecontainer");
     const boxScoreTable = document.getElementById("box-score");
+    const playerScoresDiv = document.getElementById("player-scores");
 
     // Array of card images (card1.png to card18.png)
     const cardImages = Array.from({ length: 18 }, (_, i) => `images/card${i + 1}.png`);
 
     // Shuffle the card images array
     const shuffleCards = () => {
-        shuffledCards = [...cardImages]; // Create a copy to shuffle
+        shuffledCards = [...cardImages];
         for (let i = shuffledCards.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]]; // Swap elements
+            [shuffledCards[i], shuffledCards[j]] = [shuffledCards[j], shuffledCards[i]];
         }
     };
 
@@ -174,8 +162,7 @@
     addPlayerButton.addEventListener("click", () => {
         const playerInputField = document.createElement("div");
         playerInputField.innerHTML = `
-            <label>Player Name:</label>
-            <input type="text" class="player-name-input" placeholder="Player Name">
+            <input type="text" class="player-name-input">
         `;
         playerInputsContainer.appendChild(playerInputField);
     });
@@ -191,7 +178,7 @@
         if (playerNames.length > 0) {
             playerScores = playerNames.map(name => ({
                 name,
-                scores: Array(9).fill(0), // Default to 9 holes
+                scores: Array(18).fill(0), // Default to 18 holes
             }));
 
             playerSetup.style.display = "none";
@@ -199,12 +186,30 @@
 
             shuffleCards(); // Shuffle cards before starting the game
             updateBoxScore();
-            updateTotalScore();
+            displayPlayerScores();
             showNextCard(); // Show the first card
         } else {
             alert("Please add at least one player.");
         }
     });
+
+    // Update Player Scores Display
+    const displayPlayerScores = () => {
+        playerScoresDiv.innerHTML = "";
+        playerScores.forEach((player, index) => {
+            const totalScore = player.scores.reduce((acc, score) => acc + score, 0);
+            const playerRow = document.createElement("div");
+            playerRow.classList.add("player-row");
+            playerRow.innerHTML = `
+                <span>${player.name}: ${totalScore}</span>
+                <div>
+                    <button class="btn-small" onclick="adjustScore(${index}, -1)">-1</button>
+                    <button class="btn-small" onclick="adjustScore(${index}, 1)">+1</button>
+                </div>
+            `;
+            playerScoresDiv.appendChild(playerRow);
+        });
+    };
 
     // Update Box Score Table
     const updateBoxScore = () => {
@@ -230,22 +235,11 @@
         });
     };
 
-    // Update Total Score Display
-    const updateTotalScore = () => {
-        let totalScore = 0;
-        playerScores.forEach(player => {
-            totalScore += player.scores.reduce((acc, score) => acc + score, 0);
-        });
-        document.getElementById("total-score").textContent = `Total Score: ${totalScore}`;
-    };
-
     // Adjust Score Function
-    const adjustScore = (adjustment) => {
-        playerScores.forEach(player => {
-            player.scores[currentCardIndex] += adjustment;
-        });
+    const adjustScore = (playerIndex, adjustment) => {
+        playerScores[playerIndex].scores[currentCardIndex - 1] += adjustment;
+        displayPlayerScores();
         updateBoxScore();
-        updateTotalScore();
     };
 
     // Show the next card in the shuffled order
@@ -255,7 +249,7 @@
             document.getElementById("current-card").src = cardImage;
             currentCardIndex++;
         } else {
-            alert("All cards have been shown!");
+            alert("GAME OVER");
             currentCardIndex = 0; // Reset the game
         }
     };
@@ -269,18 +263,12 @@
     toggleBoxScoreButton.addEventListener("click", () => {
         boxScoreTable.classList.toggle("expanded");
     });
-
-    // Increment/Decrement Buttons
-    const incrementButton = document.getElementById("increment-score");
-    const decrementButton = document.getElementById("decrement-score");
-
-    incrementButton.addEventListener("click", () => adjustScore(1));
-    decrementButton.addEventListener("click", () => adjustScore(-1));
 </script>
 
-    <h6>v 0.7.6.4</h6>
+    <h6>v 0.7.6.5</h6>
 </body>
 </html>
+
 
 
 
