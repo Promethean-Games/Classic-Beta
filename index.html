@@ -95,8 +95,8 @@
     </style>
 </head>
 <body>
-    <div id="splash-screen">
-        <img src="images/Splash-Screen.png" alt="Splash Screen" width=300px height=auto>
+    <div id="splash-screen" style="display: block;"> <!-- Splash screen visible by default -->
+        <img src="images/Splash-Screen.png" alt="Splash Screen" width="300px" height="auto">
         <button id="setup-game" class="btn">Next</button>
     </div>
 
@@ -116,7 +116,7 @@
 
 <script>
     // Global Variables
-    let playerScores = []; // Define playerScores to avoid errors
+    let playerScores = [];
     const gameContainer = document.getElementById("gamecontainer");
     const boxScoreTable = document.getElementById("box-score");
 
@@ -202,6 +202,6 @@
     });
 </script>
 
-    <h6>v 0.7.5.14</h6>
+    <h6>v 0.7.5.15</h6>
 </body>
 </html>
