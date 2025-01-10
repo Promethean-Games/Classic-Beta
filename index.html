@@ -5,36 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Par for the Course - Classic</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        td {
-            border: 1px solid #d11111;
-            padding: 8px;
-            text-align: center;
-        }
-        .btn {
-            background-color: #d11111;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin: 2px;
-        }
-        .btn:hover {
-            opacity: 0.8;
-        }
-        .score-controls-row {
-            margin-bottom: 10px;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      text-align: center;
+    }
+
+    #splash-screen, #player-setup, #game-area {
+      max-width: 400px;
+      margin: 20px auto;
+      display: none;
+    }
+
+    #splash-screen img {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #d11111;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #a50e0e;
+    }
+
+    #scoreboard, #box-score {
+      text-align: left;
+      margin-top: 20px;
+    }
+
+    .scoreboard-row, .box-score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+    }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .card-image {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    table, th, td {
+      border: 1px solid white;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #444;
+    }
 
 #box-score {
     display: none; /* Hide the box score by default */
@@ -52,13 +101,14 @@
     </div>
 
     <div id="player-setup" style="display: none;">
-        <h2>Player Setup</h2>
+        <h2>Enter Player Names</h2>
         <div id="player-inputs"></div>
         <button id="add-player" class="btn">Add Player</button>
         <button id="start-game" class="btn">Start Game</button>
     </div>
 
     <div id="gamecontainer" style="display: none;">
+      <img id="current-card" class="card-image" src="" alt="Card Image">
         <div id="score-controls"></div>
         <table id="box-score"></table>
         <button id="next-hole" class="btn">Next Card</button>
@@ -153,7 +203,7 @@
 </script>
 
 
-    <h6>v 0.7.5.11</h6>
+    <h6>v 0.7.5.12</h6>
 </body>
 </html>
 
