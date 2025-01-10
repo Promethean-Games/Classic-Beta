@@ -129,6 +129,11 @@
         <button id="toggle-box-score" class="btn">Show Box Score</button>
         <table id="box-score" style="display: none;"></table>
     </div>
+
+    <footer>
+        <h6>v 0.7.7.2</h6>
+    </footer>
+
     <script>
         // Global Variables
         let playerScores = [];
@@ -187,11 +192,13 @@
             boxScore.innerHTML = `
                 <tr>
                     <th>Player</th>
+                    ${Array.from({ length: 18 }, (_, i) => `<th>${i + 1}</th>`).join("")}
                     <th>Total</th>
                 </tr>
                 ${playerScores.map(player => `
                     <tr>
                         <td>${player.name}</td>
+                        ${player.scores.map(score => `<td>${score}</td>`).join("")}
                         <td>${player.totalScore}</td>
                     </tr>
                 `).join("")}
@@ -259,7 +266,7 @@
             const uniqueNames = new Set(playerNames.filter(name => name.length > 0));
 
             if (uniqueNames.size !== playerNames.length) {
-                alert("Player names must be unique and not empty.");
+                alert("Player names cannot be empty and must be unique (no duplicates).");
                 return;
             }
 
@@ -293,6 +300,5 @@
         document.getElementById("splash-screen").style.display = "block";
     </script>
 </body>
-    <footer>v 0.7.8.2</footer>
+    <footer>v 0.7.8.3</footer>
 </html>
-
