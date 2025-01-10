@@ -10,12 +10,15 @@
             background-color: #000;
             color: #fff;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
 
         #splash-screen, #player-setup, #game-area {
             max-width: 400px;
             margin: 20px auto;
             display: none;
+            padding: 10px;
         }
 
         #splash-screen img {
@@ -52,8 +55,6 @@
         .increment-btns {
             display: flex;
             justify-content: center;
-            background-color: #d11111;
-            color: white;
             gap: 5px;
             margin: 10px 0;
         }
@@ -85,13 +86,24 @@
         }
 
         #box-score td, #box-score th {
-            border: 1px 
             padding: 8px;
             text-align: center;
         }
 
         #box-score th {
             background-color: #d11111;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .btn, .btn-small {
+                width: 100%;
+                box-sizing: border-box;
+            }
         }
     </style>
 </head>
@@ -119,8 +131,13 @@
         <div id="increment-buttons"></div>
         <table id="box-score"></table>
         <button id="next-hole" class="btn">Next Card</button>
-        <button id="restart-game" class="btn">Restart</button>
+        <button id="reset-scores" class="btn">Reset Scores</button>
+        <button id="restart-game" class="btn">Restart Game</button>
     </div>
+
+    <footer>
+        <p>v 0.8.0</p>
+    </footer>
 
     <script>
         // Global Variables
@@ -131,6 +148,7 @@
         const cardImages = Array.from({ length: 18 }, (_, i) => {
             const img = new Image();
             img.src = `images/card${i + 1}.png`;
+            img.alt = `Card ${i + 1}`;
             return img;
         });
 
@@ -150,7 +168,7 @@
             const playerScoresDiv = document.getElementById("player-scores");
             playerScoresDiv.innerHTML = playerScores.map(player => `
                 <div class="player-score">
-                    <span>${player.name}: ${player.scores.reduce((a, b) => a + b, 0)}</span>
+                    <span>${player.name}: ${player.totalScore}</span>
                 </div>
             `).join("");
 
@@ -168,6 +186,7 @@
         // Adjust Player Scores
         const adjustScore = (playerIndex, adjustment) => {
             playerScores[playerIndex].scores[currentCardIndex] += adjustment;
+            playerScores[playerIndex].totalScore = playerScores[playerIndex].scores.reduce((a, b) => a + b, 0);
             updateGameDisplay();
         };
 
@@ -182,7 +201,7 @@
                 ${playerScores.map(player => `
                     <tr>
                         <td>${player.name}</td>
-                        <td>${player.scores.reduce((a, b) => a + b, 0)}</td>
+                        <td>${player.totalScore}</td>
                     </tr>
                 `).join("")}
             `;
@@ -190,12 +209,23 @@
 
         // Restart Game
         const restartGame = () => {
-            playerScores = [];
-            currentCardIndex = 0;
-            shuffleCards();
-            document.getElementById("splash-screen").style.display = "block";
-            document.getElementById("player-setup").style.display = "none";
-            document.getElementById("game-area").style.display = "none";
+            if (confirm("This will CLEAR ALL player names and scores. Are you sure you want to restart the game?")) {
+                playerScores = [];
+                currentCardIndex = 0;
+                shuffleCards();
+                document.getElementById("splash-screen").style.display = "block";
+                document.getElementById("player-setup").style.display = "none";
+                document.getElementById("game-area").style.display = "none";
+            }
+        };
+
+        // Reset Scores
+        const resetScores = () => {
+            playerScores.forEach(player => {
+                player.scores.fill(0);
+                player.totalScore = 0;
+            });
+            updateGameDisplay();
         };
 
         // Event Listeners
@@ -208,7 +238,6 @@
             const playerInputs = document.getElementById("player-inputs");
             const playerInputField = document.createElement("div");
             playerInputField.innerHTML = `
-                <label>Player Name:</label>
                 <input type="text" class="player-name-input" placeholder="Player Name">
             `;
             playerInputs.appendChild(playerInputField);
@@ -219,32 +248,32 @@
                 .map(input => input.value.trim())
                 .filter(name => name.length > 0);
 
-            if (playerNames.length > 0) {
-                playerScores = playerNames.map(name => ({
-                    name,
-                    scores: Array(18).fill(0)
-                }));
+            const uniqueNames = new Set(playerNames);
 
-                document.getElementById("player-setup").style.display = "none";
-                document.getElementById("game-area").style.display = "block";
-
-                shuffleCards();
-                updateGameDisplay();
-            } else {
+            if (playerNames.length === 0) {
                 alert("Please add at least one player.");
+                return;
+            }
+
+            if (uniqueNames.size !== playerNames.length) {
+                alert("Player names must be unique.");
+                        });
+
+        document.getElementById("restart-game").addEventListener("click", () => {
+            const confirmation = confirm("Are you sure you want to restart? All progress will be lost.");
+            if (confirmation) {
+                restartGame();
             }
         });
 
-        document.getElementById("next-hole").addEventListener("click", () => {
-            if (currentCardIndex < cardImages.length - 1) {
-                currentCardIndex++;
-                updateGameDisplay();
-            } else {
-                alert("GAME OVER");
-            }
+        document.getElementById("reset-scores").addEventListener("click", () => {
+            playerScores.forEach(player => {
+                player.scores.fill(0);
+                player.total = 0;
+            });
+            currentCardIndex = 0;
+            updateGameDisplay();
         });
-
-        document.getElementById("restart-game").addEventListener("click", restartGame);
 
         // Initial Setup
         document.addEventListener("DOMContentLoaded", () => {
@@ -252,6 +281,8 @@
         });
     </script>
 
-    <h6>v 0.7.7.2</h6>
+    <footer>
+        <h6>v 0.7.8.0</h6>
+    </footer>
 </body>
 </html>
