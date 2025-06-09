@@ -1,381 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Par for the Course - Scoring App</title>
-  <style>
-    /* Reset and base styles */
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #121212;
-      color: #eee;
-      overflow-x: hidden;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Par for the Course - Classic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+        }
 
-    /* Splash Screen styles */
-    #splash-screen {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #d11111;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      user-select: none;
-      font-weight: bold;
-      font-size: 2.5rem;
-      text-align: center;
-      padding: 20px;
-    }
-    #splash-screen button {
-      margin-top: 30px;
-      font-size: 1.2rem;
-      padding: 12px 28px;
-      border: none;
-      border-radius: 12px;
-      background-color: #fff;
-      color: #d11111;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 4px 8px rgba(255,255,255,0.7);
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #splash-screen button:hover {
-      background-color: #f0f0f0;
-    }
+        #splash-screen, #player-setup, #game-area {
+            max-width: 400px;
+            margin: 20px auto;
+            display: none;
+        }
 
-    /* Main container styles */
-    #main-container {
-      display: none; /* hidden initially until splash dismissed */
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding-bottom: 100px; /* for bottom fixed bar */
-      user-select: none;
-    }
+        #splash-screen img {
+            width: 100%;
+            max-width: 300px;
+        }
 
-    h1 {
-      margin: 20px 0 10px 0;
-      color: #d11111;
-      font-weight: bold;
-      font-size: 2rem;
-      user-select: none;
-    }
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
 
-    /* Player swipe container */
-    #player-swipe-container {
-      margin: 20px auto;
-      max-width: 360px;
-      background: #1c1c1c;
-      border-radius: 12px;
-      padding: 20px;
-      touch-action: pan-y;
-      box-shadow: 0 0 10px rgba(209, 17, 17, 0.6);
-      user-select: none;
-    }
+        .btn {
+            padding: 10px 20px;
+            background-color: #d11111;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    #active-player-banner {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin-bottom: 25px;
-      color: #d11111;
-      text-align: center;
-    }
+        .btn:hover {
+            background-color: #a50e0e;
+        }
 
-    #increment-buttons {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      gap: 15px;
-    }
+        .player-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
 
-    .big-btn {
-      font-size: 3.5rem;
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      border: none;
-      background-color: #d11111;
-      color: white;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 4px 8px rgba(209, 17, 17, 0.8);
-      transition: background-color 0.15s ease;
-    }
-    .big-btn:active {
-      background-color: #a50e0e;
-    }
+        .player-name {
+            flex: 1;
+            text-align: left;
+        }
 
-    .medium-btn {
-      font-size: 1.3rem;
-      padding: 12px 24px;
-      border-radius: 10px;
-      background-color: #d11111;
-      color: white;
-      border: none;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 4px 8px rgba(209, 17, 17, 0.7);
-      transition: background-color 0.15s ease;
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-    .medium-btn:active {
-      background-color: #a50e0e;
-    }
+        .increment-btns {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
 
-    #swipe-hint {
-      margin-top: 12px;
-      font-size: 0.85rem;
-      color: #888;
-      text-align: center;
-      font-style: italic;
-      user-select: none;
-    }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            background-color: #d11111;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
 
-    /* Bottom fixed button banner */
-    #bottom-fixed-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: #1a1a1a;
-      border-top: 2px solid #d11111;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 70px;
-      padding: 0 10px;
-      z-index: 9999;
-      box-shadow: 0 -3px 10px rgba(209, 17, 17, 0.8);
-      user-select: none;
-    }
+        .btn-small:hover {
+            background-color: #a50e0e;
+        }
 
-    #bottom-fixed-bar button {
-      background-color: #d11111;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 18px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(209, 17, 17, 0.8);
-      transition: background-color 0.2s ease;
-      flex-grow: 1;
-      margin: 0 5px;
-      max-width: 150px;
-      user-select: none;
-      white-space: nowrap;
-    }
-    #bottom-fixed-bar button:active {
-      background-color: #a50e0e;
-    }
+        .card-image {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px 0;
+        }
 
-    /* Responsive */
-    @media (max-width: 400px) {
-      #player-swipe-container {
-        width: 90vw;
-        padding: 15px;
-      }
-      .big-btn {
-        width: 70px;
-        height: 70px;
-        font-size: 2.8rem;
-      }
-      .medium-btn {
-        font-size: 1rem;
-        padding: 8px 16px;
-      }
-      #bottom-fixed-bar {
-        height: 60px;
-      }
-      #bottom-fixed-bar button {
-        font-size: 1rem;
-        max-width: 120px;
-        padding: 8px 12px;
-        margin: 0 3px;
-      }
-    }
-  </style>
+        #box-score {
+            margin: 20px auto;
+            width: 100%;
+            max-width: 400px;
+            border-collapse: collapse;
+        }
+
+        #box-score-wrapper table {
+    width: 100%;
+    max-width: 400px;
+    border-collapse: collapse;
+}
+
+#box-score-wrapper td, #box-score-wrapper th {
+    border: 1px solid #fff;
+    padding: 8px;
+    text-align: center;
+}
+
+#box-score-wrapper th {
+    background-color: #d11111;
+}
+
+        #box-score td, #box-score th {
+            border: 1px solid #fff;
+            padding: 8px;
+            text-align: center;
+        }
+
+        #box-score th {
+            background-color: #d11111;
+        }
+
+        footer {
+            margin: 20px auto;
+            color: #fff;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash-screen" role="dialog" aria-modal="true" aria-labelledby="splash-title" tabindex="-1">
-    <div id="splash-title">Welcome to Par for the Course!</div>
-    <button id="start-btn" aria-label="Start scoring">Start Scoring</button>
-  </div>
-
-  <!-- Main Scoring UI -->
-  <div id="main-container" role="main" aria-live="polite">
-    <h1>Par for the Course</h1>
-
-    <div id="player-swipe-container" aria-label="Player score controls" tabindex="0">
-      <div id="active-player-banner" aria-live="polite">Loading...</div>
-      <div id="increment-buttons">
-        <button id="decrement-score" class="big-btn" aria-label="Decrease score">–</button>
-        <button id="scratch-score" class="medium-btn" aria-label="Scratch adds 2">Scratch</button>
-        <button id="increment-score" class="big-btn" aria-label="Increase score">+</button>
-      </div>
-      <div id="swipe-hint">Swipe left/right to change player</div>
+    <div id="splash-screen">
+        <img src="images/Splash-Screen.png" alt="Splash Screen">
+        <button id="setup-game" class="btn">Next</button>
     </div>
-  </div>
 
-  <!-- Bottom fixed button bar -->
-  <div id="bottom-fixed-bar">
-    <button id="reset-scores-btn" aria-label="Reset Scores">Reset Scores</button>
-    <button id="download-scores-btn" aria-label="Download Scores">Download Scores</button>
-    <button id="buy-game-btn" aria-label="Buy the game">Buy the Game</button>
-  </div>
+    <div id="player-setup" style="display: none;">
+        <h2>Enter Player Names</h2>
+        <div id="player-inputs">
+            <div>
+                <input type="text" class="player-name-input" placeholder="Player Name">
+            </div>
+        </div>
+        <button id="add-player" class="btn">Add Player</button>
+        <button id="start-game" class="btn">Start Game</button>
+    </div>
 
-  <script>
-    // === Splash screen logic ===
-    const splashScreen = document.getElementById("splash-screen");
-    const startBtn = document.getElementById("start-btn");
-    const mainContainer = document.getElementById("main-container");
+    <div id="game-area" style="display: none;">
+        <h2>Current Card</h2>
+        <img id="current-card" class="card-image" src="images/card1.png" alt="Card Image">
+        <div id="player-scores"></div>
+        <button id="next-hole" class="btn">Next Card</button>
+        <button id="restart-game" class="btn">Restart</button>
+        <button id="reset-scores" class="btn">Reset Scores</button>
+        <button id="toggle-box-score" class="btn">Show Box Score</button>
+        <div id="box-score-wrapper" style="display: none;">
+    <table id="box-score-1-9"></table>
+    <table id="box-score-10-18" style="margin-top: 20px;"></table>
+</div>
+        <table id="box-score" style="display: none;"></table>
+    </div>
+    <script>
+        // Global Variables
+        let playerScores = [];
+        let currentCardIndex = 0;
+        let isBoxScoreVisible = false;
 
-    startBtn.addEventListener("click", () => {
-      splashScreen.style.display = "none";
-      mainContainer.style.display = "flex";
-      updateActivePlayerDisplay();
-      // Focus the main swipe container for accessibility
-      document.getElementById("player-swipe-container").focus();
-    });
+        // Array of Card Images (Preloading)
+        const cardImages = Array.from({ length: 18 }, (_, i) => {
+            const img = new Image();
+            img.src = `images/card${i + 1}.png`;
+            return img;
+        });
 
-    // === Data setup ===
-    const playerScores = [
-      { name: "Alice", scores: Array(18).fill(0), totalScore: 0 },
-      { name: "Bob", scores: Array(18).fill(0), totalScore: 0 },
-      { name: "Charlie", scores: Array(18).fill(0), totalScore: 0 }
-    ];
-    let currentCardIndex = 0; // Assuming scoring for the current hole/card
+        // Shuffle Cards
+        const shuffleCards = () => {
+            for (let i = cardImages.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardImages[i], cardImages[j]] = [cardImages[j], cardImages[i]];
+            }
+        };
 
-    let activePlayerIndex = 0;
+        // Update Game Display
+        const updateGameDisplay = () => {
+            const currentCard = cardImages[currentCardIndex];
+            document.getElementById("current-card").src = currentCard.src;
 
-    // === DOM Elements ===
-    const banner = document.getElementById("active-player-banner");
-    const incrementBtn = document.getElementById("increment-score");
-    const decrementBtn = document.getElementById("decrement-score");
-    const scratchBtn = document.getElementById("scratch-score");
+            const playerScoresDiv = document.getElementById("player-scores");
+            playerScoresDiv.innerHTML = playerScores.map((player, idx) => `
+                <div class="player-score">
+                    <span class="player-name">${player.name}: ${player.totalScore}</span>
+                    <div class="increment-btns">
+                        <button class="btn-small" onclick="adjustScore(${idx}, 1)">+1</button>
+                        <button class="btn-small" onclick="adjustScore(${idx}, -1)">-1</button>
+                    </div>
+                </div>
+            `).join("");
 
-    // Bottom buttons
-    const resetBtn = document.getElementById("reset-scores-btn");
-    const downloadBtn = document.getElementById("download-scores-btn");
-    const buyGameBtn = document.getElementById("buy-game-btn");
+            updateBoxScore();
+        };
 
-    // Swipe container
-    const swipeContainer = document.getElementById("player-swipe-container");
-    let touchStartX = 0;
+        // Adjust Player Scores
+        const adjustScore = (playerIndex, adjustment) => {
+            const player = playerScores[playerIndex];
+            player.scores[currentCardIndex] += adjustment;
+            player.totalScore = player.scores.reduce((a, b) => a + b, 0);
+            updateGameDisplay();
+        };
 
-    // === Functions ===
+        // Update Box Score Table
+const updateBoxScore = () => {
+    const boxScoreWrapper = document.getElementById("box-score-wrapper");
+    const boxScore1to9 = document.getElementById("box-score-1-9");
+    const boxScore10to18 = document.getElementById("box-score-10-18");
 
-    function updateActivePlayerDisplay() {
-      const player = playerScores[activePlayerIndex];
-      banner.textContent = `${player.name} — Score: ${player.totalScore}`;
+    // Populate Holes 1-9
+    boxScore1to9.innerHTML = `
+        <tr>
+            <th>Player</th>
+            ${Array.from({ length: 9 }, (_, i) => `<th>${i + 1}</th>`).join("")}
+            <th>Total</th>
+        </tr>
+        ${playerScores.map(player => `
+            <tr>
+                <td>${player.name}</td>
+                ${player.scores.slice(0, 9).map(score => `<td>${score}</td>`).join("")}
+                <td>${player.totalScore}</td>
+            </tr>
+        `).join("")}
+    `;
+
+    // Populate Holes 10-18
+    boxScore10to18.innerHTML = `
+        <tr>
+            <th>Player</th>
+            ${Array.from({ length: 9 }, (_, i) => `<th>${i + 10}</th>`).join("")}
+            <th>Total</th>
+        </tr>
+        ${playerScores.map(player => `
+            <tr>
+                <td>${player.name}</td>
+                ${player.scores.slice(9).map(score => `<td>${score}</td>`).join("")}
+                <td>${player.totalScore}</td>
+            </tr>
+        `).join("")}
+    `;
+};
+
+        // Toggle Box Score Visibility
+       const toggleBoxScore = () => {
+    const boxScoreWrapper = document.getElementById("box-score-wrapper");
+    const toggleButton = document.getElementById("toggle-box-score");
+
+    isBoxScoreVisible = !isBoxScoreVisible;
+
+    if (isBoxScoreVisible) {
+        boxScoreWrapper.style.display = "block";
+        toggleButton.textContent = "Hide Box Score";
+    } else {
+        boxScoreWrapper.style.display = "none";
+        toggleButton.textContent = "Show Box Score";
     }
+};
 
-    function updateTotalScoreForPlayer(player) {
-      player.totalScore = player.scores.reduce((a, b) => a + b, 0);
-    }
+        // Restart Game
+        const restartGame = () => {
+            if (confirm("This will CLEAR ALL player names and scores. Are you sure you want to restart the game?")) {
+                playerScores = [];
+                currentCardIndex = 0;
+                shuffleCards();
+                document.getElementById("splash-screen").style.display = "block";
+                document.getElementById("player-setup").style.display = "none";
+                document.getElementById("game-area").style.display = "none";
+            }
+        };
 
-    function adjustScore(adjustment) {
-      const player = playerScores[activePlayerIndex];
-      player.scores[currentCardIndex] += adjustment;
-      if (player.scores[currentCardIndex] < 0) player.scores[currentCardIndex] = 0;
-      updateTotalScoreForPlayer(player);
-      updateActivePlayerDisplay();
-    }
+        // Reset Scores
+        const resetScores = () => {
+            if (confirm("Are you sure you want to reset all scores?")) {
+                playerScores.forEach(player => {
+                    player.scores.fill(0);
+                    player.totalScore = 0;
+                });
+                updateGameDisplay();
+            }
+        };
 
-    function resetScores() {
-      playerScores.forEach(player => {
-        for(let i = 0; i < player.scores.length; i++) {
-          player.scores[i] = 0;
-        }
-        updateTotalScoreForPlayer(player);
-      });
-      updateActivePlayerDisplay();
-      alert("Scores have been reset.");
-    }
+        // Event Listeners
+        document.getElementById("setup-game").addEventListener("click", () => {
+            document.getElementById("splash-screen").style.display = "none";
+            document.getElementById("player-setup").style.display = "block";
+        });
 
-    function downloadScores() {
-      // Prepare CSV data
-      let csvContent = "data:text/csv;charset=utf-8,";
-      // Header row
-      csvContent += "Player," + playerScores[0].scores.map((_,i) => `Hole ${i+1}`).join(",") + ",Total\n";
-      playerScores.forEach(player => {
-        csvContent += player.name + "," + player.scores.join(",") + "," + player.totalScore + "\n";
-      });
+        document.getElementById("add-player").addEventListener("click", () => {
+            const playerInputs = document.getElementById("player-inputs");
+            const playerInputField = document.createElement("div");
+            playerInputField.innerHTML = `
+                <input type="text" class="player-name-input" placeholder="Player Name">
+            `;
+            playerInputs.appendChild(playerInputField);
+        });
 
-      // Create download link
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      const timestamp = new Date().toISOString().replace(/[:.-]/g, "");
-      link.setAttribute("download", `par_for_the_course_scores_${timestamp}.csv`);
-      document.body.appendChild(link); // Required for Firefox
-      link.click();
-      document.body.removeChild(link);
-    }
+        document.getElementById("start-game").addEventListener("click", () => {
+            const playerNames = Array.from(document.querySelectorAll(".player-name-input"))
+                .map(input => input.value.trim());
 
-    function buyGame() {
-      // Replace this URL with your actual purchase/store page
-      const storeUrl = "https://www.thegamecrafter.com/designers/promethean-games";
-      window.open(storeUrl, "_blank");
-    }
+            const uniqueNames = new Set(playerNames.filter(name => name.length > 0));
 
-    // === Event Listeners ===
+            if (uniqueNames.size !== playerNames.length) {
+                alert("Player names must be unique and not empty.");
+                return;
+            }
 
-    incrementBtn.addEventListener("click", () => adjustScore(1));
-    decrementBtn.addEventListener("click", () => adjustScore(-1));
-    scratchBtn.addEventListener("click", () => adjustScore(2));
+            playerScores = Array.from(uniqueNames).map(name => ({
+                name,
+                scores: Array(18).fill(0),
+                totalScore: 0,
+            }));
 
-    resetBtn.addEventListener("click", resetScores);
-    downloadBtn.addEventListener("click", downloadScores);
-    buyGameBtn.addEventListener("click", buyGame);
+            document.getElementById("player-setup").style.display = "none";
+            document.getElementById("game-area").style.display = "block";
 
-    // Swipe detection for mobile touch
-    swipeContainer.addEventListener("touchstart", (e) => {
-      touchStartX = e.changedTouches[0].screenX;
-    });
+            shuffleCards();
+            updateGameDisplay();
+        });
 
-    swipeContainer.addEventListener("touchend", (e) => {
-      const touchEndX = e.changedTouches[0].screenX;
-      const deltaX = touchEndX - touchStartX;
-      if (Math.abs(deltaX) > 50) { // swipe threshold
-        if (deltaX > 0) {
-          // Swipe right: previous player
-          activePlayerIndex = (activePlayerIndex - 1 + playerScores.length) % playerScores.length;
-        } else {
-          // Swipe left: next player
-          activePlayerIndex = (activePlayerIndex + 1) % playerScores.length;
-        }
-        updateActivePlayerDisplay();
-      }
-    });
+        document.getElementById("next-hole").addEventListener("click", () => {
+            currentCardIndex++;
+            if (currentCardIndex >= cardImages.length) {
+                currentCardIndex = 0;
+            }
+            updateGameDisplay();
+        });
 
-    // Keyboard navigation for desktop (left/right arrows)
-    document.addEventListener("keydown", (e) => {
-      if (mainContainer.style.display === "flex") {
-        if (e.key === "ArrowLeft") {
-          activePlayerIndex = (activePlayerIndex - 1 + playerScores.length) % playerScores.length;
-          updateActivePlayerDisplay();
-        }
-        if (e.key === "ArrowRight") {
-          activePlayerIndex = (activePlayerIndex + 1) % playerScores.length;
-          updateActivePlayerDisplay();
-        }
-      }
-    });
+        document.getElementById("restart-game").addEventListener("click", restartGame);
+        document.getElementById("reset-scores").addEventListener("click", resetScores);
+        document.getElementById("toggle-box-score").addEventListener("click", toggleBoxScore);
 
-  </script>
+        // Initial Display
+        document.getElementById("splash-screen").style.display = "block";
+    </script>
 </body>
+    <footer>v 0.7.8.5</footer>
 </html>
-
-
 
 
